@@ -1,3 +1,4 @@
 LicitIA.Api/bin/
 LicitIA.Api/obj/
 *.user
+LicitIA.Api/appsettings.json

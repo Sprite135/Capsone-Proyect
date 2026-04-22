@@ -10,23 +10,23 @@
   },
   "AllowedHosts": "*",
   "Jwt": {
-    "Key": "LicitIA_Secret_Key_2024_Super_Secure_32_Chars",
+    "Key": "CHANGE_ME_REPLACE_WITH_STRONG_SECRET",
     "Issuer": "LicitIA",
     "Audience": "LicitIAUsers",
     "ExpirationMinutes": 1440,
     "RememberMeExpirationDays": 30
   },
   "GoogleAuth": {
-    "ClientId": "637575586295-sejvbvuoc9phcuu7pk535praauff3lf6.apps.googleusercontent.com",
-    "ClientSecret": "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",
+    "ClientId": "YOUR_GOOGLE_CLIENT_ID",
+    "ClientSecret": "YOUR_GOOGLE_CLIENT_SECRET",
     "RedirectUri": "http://localhost:5153/api/auth/google/callback"
   },
   "Email": {
     "SmtpHost": "smtp.gmail.com",
     "SmtpPort": "587",
-    "SmtpUser": "spritesebastian@gmail.com",
-    "SmtpPassword": "quuw fzzh ietu ccww",
-    "FromEmail": "spritesebastian@gmail.com",
+    "SmtpUser": "your-email@gmail.com",
+    "SmtpPassword": "YOUR_APP_PASSWORD",
+    "FromEmail": "your-email@gmail.com",
     "FromName": "LicitIA"
   }
 }
