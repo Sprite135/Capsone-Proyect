@@ -1,10 +1,16 @@
 {
   "ExpandedNodes": [
     "",
+    "\\bin",
+    "\\bin\\Debug",
+    "\\Configuration",
+    "\\Contracts",
+    "\\Models",
     "\\obj",
     "\\obj\\Debug",
-    "\\Properties"
+    "\\Properties",
+    "\\Security"
   ],
-  "SelectedNode": "\\LicitIA.Api.csproj",
+  "SelectedNode": "\\bin\\Debug",
   "PreviewInSolutionExplorer": false
 }

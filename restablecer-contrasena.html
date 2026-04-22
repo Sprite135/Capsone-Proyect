@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LicitIA | Restablecer Contraseña</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <main class="auth-container">
+    <div class="auth-card">
+      <section class="auth-main">
+        <div class="top-links">
+          <a class="back-link" href="login.html">Volver al login</a>
+        </div>
+
+        <p class="eyebrow">Restablecer contraseña</p>
+        <h2>Crea tu nueva contraseña</h2>
+        <p class="help-text">Ingresa tu nueva contraseña. Asegurate de que sea segura y facil de recordar.</p>
+
+        <form class="auth-form" id="resetPasswordForm">
+          <div class="form-field">
+            <label for="token">Token de recuperación</label>
+            <input id="token" name="token" type="text" placeholder="Ingresa el token del correo" required>
+          </div>
+          <div class="form-field password-field">
+            <label for="newPassword">Nueva contraseña</label>
+            <div class="password-wrap">
+              <input id="newPassword" name="newPassword" type="password" placeholder="Minimo 8 caracteres" autocomplete="new-password" required minlength="8">
+              <button type="button" class="password-toggle" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a22.84 22.84 0 0 1 5.06-6.06M9.88 9.88A3 3 0 0 0 14.12 14.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 1l22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="form-field password-field">
+            <label for="confirmPassword">Confirmar contraseña</label>
+            <div class="password-wrap">
+              <input id="confirmPassword" name="confirmPassword" type="password" placeholder="Repite tu nueva contraseña" autocomplete="new-password" required minlength="8">
+              <button type="button" class="password-toggle" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a22.84 22.84 0 0 1 5.06-6.06M9.88 9.88A3 3 0 0 0 14.12 14.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 1l22 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button class="primary-button" type="submit">Restablecer contraseña</button>
+          <p class="form-status" id="formStatus" aria-live="polite"></p>
+        </form>
+
+        <p class="footer-link">
+          ¿Ya la recordaste? <a href="login.html">Inicia sesion aqui</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+  <script>
+    const API_BASE = "http://localhost:5153";
+    const resetPasswordForm = document.getElementById("resetPasswordForm");
+    const formStatus = document.getElementById("formStatus");
+
+    // Get token from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+    if (tokenFromUrl) {
+      const tokenInput = document.getElementById('token');
+      if (tokenInput) {
+        tokenInput.value = tokenFromUrl;
+      }
+    }
+
+    if (resetPasswordForm) {
+      resetPasswordForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const submitButton = resetPasswordForm.querySelector("button[type='submit']");
+        const formData = new FormData(resetPasswordForm);
+        const token = String(formData.get("token") ?? "").trim();
+        const newPassword = String(formData.get("newPassword") ?? "");
+        const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+        if (newPassword !== confirmPassword) {
+          setStatus("Las contraseñas no coinciden.", "error");
+          return;
+        }
+
+        if (newPassword.length < 8) {
+          setStatus("La contraseña debe tener al menos 8 caracteres.", "error");
+          return;
+        }
+
+        try {
+          setStatus("Restableciendo contraseña...", "success");
+          submitButton.disabled = true;
+
+          const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ token, newPassword })
+          });
+
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            const errorMessage = data.message || "No se pudo restablecer la contraseña.";
+            setStatus(errorMessage, "error");
+            return;
+          }
+
+          setStatus(data.message || "Contraseña restablecida correctamente.", "success");
+
+          // Redirect to login after 2 seconds
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 2000);
+        } catch (error) {
+          setStatus(
+            "No fue posible conectar con la API. Verifica que LicitIA.Api este ejecutandose en http://localhost:5153.",
+            "error");
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    }
+
+    function setStatus(message, type) {
+      if (!formStatus) {
+        return;
+      }
+
+      formStatus.textContent = message;
+      formStatus.classList.remove("success", "error");
+      formStatus.classList.add(type);
+    }
+  </script>
+  <script src="auth-client.js"></script>
+</body>
+</html>

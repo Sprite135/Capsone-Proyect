@@ -111,6 +111,124 @@ public sealed class AuthRepository
         return user;
     }
 
+    public async Task UpdateUserProfileAsync(string email, string companyName, string role, string? phone, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        // Note: Phone column doesn't exist in current DB schema, so we only update CompanyName and RoleName
+        const string sql = """
+            UPDATE dbo.AppUsers
+            SET
+                CompanyName = @CompanyName,
+                RoleName = @RoleName
+            WHERE Email = @Email
+              AND IsActive = 1;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@Email", NormalizeEmail(email));
+        command.Parameters.AddWithValue("@CompanyName", companyName.Trim());
+        command.Parameters.AddWithValue("@RoleName", role.Trim());
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task SavePasswordResetTokenAsync(Guid userId, string token, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            UPDATE dbo.AppUsers
+            SET
+                PasswordResetToken = @PasswordResetToken,
+                PasswordResetTokenExpiryUtc = @PasswordResetTokenExpiryUtc
+            WHERE UserId = @UserId;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@UserId", userId);
+        command.Parameters.AddWithValue("@PasswordResetToken", token);
+        command.Parameters.AddWithValue("@PasswordResetTokenExpiryUtc", DateTime.UtcNow.AddHours(1));
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task<AppUser?> GetUserByResetTokenAsync(string token, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            SELECT TOP (1)
+                UserId,
+                FullName,
+                CompanyName,
+                Email,
+                RoleName,
+                PasswordHash,
+                PasswordSalt,
+                IsActive,
+                CreatedAtUtc
+            FROM dbo.AppUsers
+            WHERE PasswordResetToken = @PasswordResetToken
+              AND PasswordResetTokenExpiryUtc > GETUTCDATE()
+              AND IsActive = 1;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@PasswordResetToken", token);
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken))
+        {
+            return null;
+        }
+
+        return MapUser(reader);
+    }
+
+    public async Task UpdatePasswordAsync(Guid userId, byte[] passwordHash, byte[] passwordSalt, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            UPDATE dbo.AppUsers
+            SET
+                PasswordHash = @PasswordHash,
+                PasswordSalt = @PasswordSalt
+            WHERE UserId = @UserId;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@UserId", userId);
+        command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+        command.Parameters.AddWithValue("@PasswordSalt", passwordSalt);
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task ClearPasswordResetTokenAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            UPDATE dbo.AppUsers
+            SET
+                PasswordResetToken = NULL,
+                PasswordResetTokenExpiryUtc = NULL
+            WHERE UserId = @UserId;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@UserId", userId);
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private static AppUser MapUser(SqlDataReader reader) =>
         new()
         {

@@ -14,7 +14,8 @@ if (authForm) {
       mode === "login"
         ? {
             email: String(formData.get("email") ?? "").trim(),
-            password: String(formData.get("password") ?? "")
+            password: String(formData.get("password") ?? ""),
+            rememberMe: formData.get("rememberMe") === "on"
           }
         : {
             fullName: String(formData.get("fullName") ?? "").trim(),
@@ -111,3 +112,29 @@ document.addEventListener("click", (e) => {
   const visible = input.type === 'text';
   btn.setAttribute('aria-pressed', String(visible));
 });
+
+// Handle OAuth redirect from Google - token comes in URL params
+(function handleGoogleOAuthRedirect() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const name = urlParams.get('name');
+  const error = urlParams.get('error');
+
+  if (error) {
+    setStatus('Error en autenticacion de Google: ' + error, 'error');
+    return;
+  }
+
+  if (token) {
+    try {
+      localStorage.setItem('authToken', token);
+      window.AUTH_TOKEN = token;
+    } catch (e) {
+      // ignore storage errors
+    }
+
+    // Clean URL and redirect to dashboard
+    window.history.replaceState({}, document.title, window.location.pathname);
+    window.location.href = 'index.html';
+  }
+})();

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LicitIA | Completar Perfil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-shell">
+      <section class="auth-side">
+        <p class="eyebrow">Completa tu perfil</p>
+        <h1>Último paso para personalizar tu experiencia.</h1>
+        <p class="lead">
+          Cuéntanos un poco sobre tu empresa para ofrecerte licitaciones relevantes desde el primer día.
+        </p>
+      </section>
+
+      <section class="auth-main">
+        <div class="top-links">
+          <a class="back-link" href="home.html">Volver al inicio</a>
+        </div>
+
+        <p class="eyebrow">Bienvenido</p>
+        <h2 id="userName">Completa tu perfil</h2>
+        <p class="help-text">Solo necesitamos un par de datos para personalizar tu dashboard.</p>
+
+        <form class="auth-form" id="completeProfileForm">
+          <div class="form-field">
+            <label for="companyName">Nombre de tu empresa *</label>
+            <input id="companyName" name="companyName" type="text" placeholder="Ej: Emdersoft S.A.C." required>
+          </div>
+
+          <div class="form-field">
+            <label for="role">Tu rol en la empresa *</label>
+            <select id="role" name="role" required>
+              <option value="">Selecciona tu rol</option>
+              <option value="Gerente">Gerente / Director</option>
+              <option value="Analista">Analista de licitaciones</option>
+              <option value="Comercial">Ejecutivo comercial</option>
+              <option value="Consultor">Consultor</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="phone">Teléfono (opcional)</label>
+            <input id="phone" name="phone" type="tel" placeholder="+51 999 999 999">
+          </div>
+
+          <p class="terms-note">
+            Al completar tu perfil, aceptas nuestros <a href="#">términos de servicio</a> y <a href="#">política de privacidad</a>.
+          </p>
+
+          <button type="submit" class="cta-button">
+            Ir al Dashboard
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Get user data from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = decodeURIComponent(urlParams.get('token') || '');
+    const name = decodeURIComponent(urlParams.get('name') || '');
+    const email = decodeURIComponent(urlParams.get('email') || '');
+
+    if (!token) {
+      window.location.href = 'registro.html';
+    }
+
+    // Show user name
+    if (name) {
+      document.getElementById('userName').textContent = `¡Hola, ${name}!`;
+    }
+
+    // Form submission
+    document.getElementById('completeProfileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        companyName: document.getElementById('companyName').value,
+        role: document.getElementById('role').value,
+        phone: document.getElementById('phone').value,
+        token: token,
+        email: email
+      };
+
+      try {
+        const response = await fetch('/api/auth/complete-profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          // Store token and redirect to dashboard
+          localStorage.setItem('authToken', token);
+          window.AUTH_TOKEN = token;
+          window.location.href = 'index.html';
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Error al completar perfil');
+        }
+      } catch (error) {
+        alert('Error de conexión. Intenta de nuevo.');
+      }
+    });
+  </script>
+</body>
+</html>

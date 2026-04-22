@@ -9,4 +9,6 @@ public sealed class JwtOptions
     public string Audience { get; set; } = "LicitIAUsers";
 
     public int ExpirationMinutes { get; set; } = 1440;
+
+    public int RememberMeExpirationDays { get; set; } = 30;
 }

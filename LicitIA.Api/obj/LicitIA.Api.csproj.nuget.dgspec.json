@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {}
+    "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {}
   },
   "projects": {
-    "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {
+    "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
+        "projectUniqueName": "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
         "projectName": "LicitIA.Api",
-        "projectPath": "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
+        "projectPath": "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
         "packagesPath": "C:\\Users\\sprit\\.nuget\\packages\\",
-        "outputPath": "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\obj\\",
+        "outputPath": "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "D:\\Proyecto_Respalto_caps\\NuGet.Config",
+          "d:\\Proyecto_Respalto_caps\\NuGet.Config",
           "C:\\Users\\sprit\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -27,7 +27,6 @@
         ],
         "frameworks": {
           "net8.0": {
-            "framework": "net8.0",
             "targetAlias": "net8.0",
             "projectReferences": {}
           }
@@ -41,12 +40,10 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "10.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
-          "framework": "net8.0",
           "targetAlias": "net8.0",
           "dependencies": {
             "System.Data.SqlClient": {
@@ -77,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.202/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.420/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

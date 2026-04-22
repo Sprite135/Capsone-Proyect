@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LicitIA | Recuperar Contraseña</title>
+  <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <main class="auth-container">
+    <div class="auth-card">
+      <section class="auth-main">
+        <div class="top-links">
+          <a class="back-link" href="login.html">Volver al login</a>
+        </div>
+
+        <p class="eyebrow">Recuperar contraseña</p>
+        <h2>Restablece tu acceso</h2>
+        <p class="help-text">Ingresa tu correo electronico y te enviaremos un enlace para restablecer tu contraseña.</p>
+
+        <form class="auth-form" id="forgotPasswordForm">
+          <div class="form-field">
+            <label for="email">Correo electronico</label>
+            <input id="email" name="email" type="email" placeholder="equipo@emdersoft.com" autocomplete="email" required>
+          </div>
+          <button class="primary-button" type="submit">Enviar enlace de recuperación</button>
+          <p class="form-status" id="formStatus" aria-live="polite"></p>
+        </form>
+
+        <p class="footer-link">
+          ¿Ya la recordaste? <a href="login.html">Inicia sesion aqui</a>.
+        </p>
+      </section>
+    </div>
+  </main>
+  <script>
+    const API_BASE = "http://localhost:5153";
+    const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+    const formStatus = document.getElementById("formStatus");
+
+    if (forgotPasswordForm) {
+      forgotPasswordForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const submitButton = forgotPasswordForm.querySelector("button[type='submit']");
+        const formData = new FormData(forgotPasswordForm);
+        const email = String(formData.get("email") ?? "").trim();
+
+        try {
+          setStatus("Enviando correo de recuperación...", "success");
+          submitButton.disabled = true;
+
+          const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email })
+          });
+
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            const errorMessage = data.message || "No se pudo enviar el correo de recuperación.";
+            setStatus(errorMessage, "error");
+            return;
+          }
+
+          setStatus(data.message || "Si el correo existe en nuestro sistema, recibirás un enlace de recuperación.", "success");
+
+          // Redirect to login after 3 seconds
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 3000);
+        } catch (error) {
+          setStatus(
+            "No fue posible conectar con la API. Verifica que LicitIA.Api este ejecutandose en http://localhost:5153.",
+            "error");
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+    }
+
+    function setStatus(message, type) {
+      if (!formStatus) {
+        return;
+      }
+
+      formStatus.textContent = message;
+      formStatus.classList.remove("success", "error");
+      formStatus.classList.add(type);
+    }
+  </script>
+</body>
+</html>

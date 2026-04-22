@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LicitIA.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f257c63a309ec715642652e2f9c0fbf79ed7a09d")]
 [assembly: System.Reflection.AssemblyProductAttribute("LicitIA.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LicitIA.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

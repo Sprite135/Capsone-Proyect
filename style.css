@@ -29,6 +29,38 @@ html {
   scroll-behavior: smooth;
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(59, 130, 246, 0.2); }
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -124,14 +156,33 @@ h4,
   padding: 14px 16px;
   border-radius: 16px;
   color: #c7d6ed;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: linear-gradient(180deg, var(--blue), var(--teal));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .nav-item:hover,
 .nav-item.active {
   background: rgba(255, 255, 255, 0.09);
   color: white;
-  transform: translateX(2px);
+  transform: translateX(4px);
+}
+
+.nav-item:hover::before,
+.nav-item.active::before {
+  opacity: 1;
 }
 
 .sidebar-card,
@@ -142,6 +193,7 @@ h4,
 .board-column {
   border: 1px solid var(--line);
   box-shadow: 0 16px 40px var(--shadow);
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .sidebar-card {
@@ -149,6 +201,12 @@ h4,
   padding: 22px;
   border-radius: 24px;
   background: var(--panel-soft);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sidebar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(16, 35, 60, 0.35);
 }
 
 .sidebar-card h2 {
@@ -194,7 +252,7 @@ h4,
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
@@ -205,13 +263,22 @@ h4,
   margin-left: auto;
 }
 
+.action-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
 .search-box {
-  min-width: 290px;
+  min-width: 240px;
   padding: 14px 18px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--muted);
   background: var(--panel-soft);
+  flex: 1 1 auto;
 }
 
 input.search-box {
@@ -268,6 +335,11 @@ input.search-box:focus {
   opacity: 1;
 }
 
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 35px rgba(22, 119, 255, 0.35);
+}
+
 .secondary-button {
   color: var(--text);
   background: var(--panel-soft);
@@ -282,14 +354,22 @@ input.search-box:focus {
   background: linear-gradient(180deg, rgba(255,255,255,0.01), var(--panel-soft));
 }
 
-.text-link:hover {
-  transform: none;
-  color: #b8d2ff;
-  text-decoration: none;
+.chip {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  padding: 6px 12px;
 }
 
 .chip:hover {
-  transform: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.chip.active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .accent-button {
@@ -315,16 +395,25 @@ input.search-box:focus {
   background: linear-gradient(135deg, var(--orange), #ffb088);
   color: white;
   font-weight: 800;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .user-chip:hover {
-  transform: none;
-  box-shadow: none;
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(255, 156, 107, 0.35);
 }
 
 .text-link {
   color: #b8d2ff;
   font-weight: 700;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+
+.text-link:hover {
+  color: #60a5fa;
+  transform: translateX(3px);
 }
 
 .hero-panel {
@@ -360,7 +449,11 @@ input.search-box:focus {
 .inline-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+}
+
+.chip-row {
+  min-width: 0;
 }
 
 .hero-tags {
@@ -453,7 +546,8 @@ input.search-box:focus {
 }
 
 .results-layout {
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: minmax(280px, 320px) 1fr;
+  align-items: start;
 }
 
 .detail-layout {
@@ -473,6 +567,13 @@ input.search-box:focus {
 .board-column {
   padding: 24px;
   border-radius: 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover,
+.panel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px rgba(2, 8, 23, 0.5);
 }
 
 .stat-card p,
@@ -562,6 +663,15 @@ td,
 .board-card {
   padding: 18px;
   border-radius: 20px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.opportunity-card:hover,
+.result-card:hover,
+.board-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(2, 8, 23, 0.4);
+  border-color: rgba(154, 181, 219, 0.25);
 }
 
 .opportunity-top,
@@ -695,6 +805,8 @@ td,
 .filter-card {
   display: grid;
   gap: 18px;
+  min-width: 0;
+  height: fit-content;
 }
 
 .filter-group {
@@ -947,16 +1059,33 @@ td {
   }
 }
 
-@media (max-width: 1080px) {
-  .topbar,
-  .hero-panel,
-  .summary-strip,
-  .board-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 1200px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .topbar-copy {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .topbar-copy h2 {
+    max-width: 100%;
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
   }
 
   .topbar-actions {
+    flex: 1 1 100%;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+  }
+
+  .action-group {
+    flex: 1 1 auto;
+    gap: 14px;
   }
 
   .account-actions {
@@ -964,7 +1093,20 @@ td {
   }
 
   .search-box {
-    min-width: 100%;
+    flex: 1 1 220px;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .hero-panel,
+  .summary-strip,
+  .board-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-actions {
+    margin-left: 0;
   }
 
   .result-meta,
@@ -991,6 +1133,46 @@ td {
 
   .topbar-copy h2 {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+  }
+
+  .topbar-copy h2 {
+    font-size: 1.3rem;
+  }
+
+  .topbar-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .action-group {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .action-group .search-box,
+  .action-group button {
+    width: 100%;
+  }
+
+  .search-box {
+    min-width: 100%;
+    order: -1;
+  }
+
+  .account-actions {
+    margin-left: 0;
+    justify-content: center;
+    width: 100%;
   }
 }
 
