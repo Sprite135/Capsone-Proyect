@@ -9,6 +9,7 @@ using LicitIA.Api.Models;
 using LicitIA.Api.Security;
 using LicitIA.Api.Services;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,10 @@ builder.Services.AddSingleton<SqlConnectionFactory>();
 builder.Services.AddSingleton<AuthRepository>();
 builder.Services.AddSingleton<OpportunityRepository>();
 builder.Services.AddSingleton<EmailService>();
+builder.Services.AddSingleton<SeaceScraperService>();
+builder.Services.AddSingleton<CsvImportService>();
+builder.Services.AddHttpClient<OeceDataService>();
+builder.Services.AddHttpClient<OeceApiService>();
 
 
 var app = builder.Build();
@@ -59,7 +64,6 @@ app.UseExceptionHandler(exceptionApp =>
 });
 
 app.UseCors();
-
 
 // Serve static frontend files - find the project root by looking for home.html
 var contentRoot = builder.Environment.ContentRootPath;
@@ -137,6 +141,78 @@ app.MapGet("/api/opportunities/{id:int}", async (int id, OpportunityRepository r
     }
 });
 
+// Endpoint para obtener categorías únicas
+app.MapGet("/api/opportunities/categories", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        var categories = opportunities
+            .Select(o => o.Category)
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Distinct()
+            .OrderBy(c => c)
+            .ToList();
+
+        return Results.Ok(new { categories });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las categorías.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// Endpoint para obtener modalidades únicas
+app.MapGet("/api/opportunities/modalities", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        var modalities = opportunities
+            .Select(o => o.Modality)
+            .Where(m => !string.IsNullOrWhiteSpace(m))
+            .Distinct()
+            .OrderBy(m => m)
+            .ToList();
+
+        return Results.Ok(new { modalities });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las modalidades.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// Endpoint para obtener entidades únicas
+app.MapGet("/api/opportunities/entities", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        var entities = opportunities
+            .Select(o => o.EntityName)
+            .Where(e => !string.IsNullOrWhiteSpace(e))
+            .Distinct()
+            .OrderBy(e => e)
+            .ToList();
+
+        return Results.Ok(new { entities });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las entidades.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
 app.MapPost("/api/auth/register", async (
     RegisterRequest request,
     AuthRepository repository,
@@ -199,6 +275,7 @@ app.MapPost("/api/auth/login", async (
     AuthRepository repository,
     PasswordService passwordService,
     IOptions<JwtOptions> jwtOptions,
+    HttpContext httpContext,
     CancellationToken cancellationToken) =>
 {
     var validationErrors = ValidateLoginRequest(request);
@@ -209,11 +286,36 @@ app.MapPost("/api/auth/login", async (
 
     try
     {
+        // Check for failed login attempts (3 attempts in 10 seconds = block)
+        const int maxAttempts = 3;
+        var lockoutWindow = TimeSpan.FromSeconds(10);
+        var failedAttempts = await repository.GetFailedLoginAttemptsAsync(request.Email, lockoutWindow, cancellationToken);
+
+        if (failedAttempts >= maxAttempts)
+        {
+            return Results.BadRequest(new { 
+                message = "Cuenta bloqueada temporalmente. Demasiados intentos fallidos. Intenta nuevamente en 10 segundos.",
+                isLocked = true
+            });
+        }
+
         var user = await repository.GetByEmailAsync(request.Email, cancellationToken);
         if (user is null || !passwordService.VerifyPassword(request.Password, user.PasswordHash, user.PasswordSalt))
         {
-            return Results.BadRequest(new { message = "Correo o contrasena incorrectos." });
+            // Record failed login attempt
+            var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
+            await repository.RecordLoginAttemptAsync(request.Email, false, ipAddress, cancellationToken);
+
+            var remainingAttempts = maxAttempts - failedAttempts - 1;
+            return Results.BadRequest(new { 
+                message = $"Correo o contrasena incorrectos. Intentos restantes: {remainingAttempts}",
+                remainingAttempts
+            });
         }
+
+        // Record successful login attempt
+        var successIpAddress = httpContext.Connection.RemoteIpAddress?.ToString();
+        await repository.RecordLoginAttemptAsync(request.Email, true, successIpAddress, cancellationToken);
 
         var token = GenerateJwtToken(user, jwtOptions.Value, request.RememberMe);
 
@@ -233,8 +335,545 @@ app.MapPost("/api/auth/login", async (
     catch (SqlException)
     {
         return Results.Problem(
-            title: "No se pudo iniciar sesion.",
+            title: "No se pudo procesar el login.",
             detail: "Revisa la conexion a SQL Server y confirma que la base existe.",
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// SEACE scraping endpoint
+app.MapPost("/api/seace/scrape", async (
+    SeaceScraperService scraper,
+    OpportunityRepository repository,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        Console.WriteLine("[SeaceScraper] Iniciando scraping de SEACE...");
+
+        var scrapedOpportunities = await scraper.ScrapeOpportunitiesAsync(100, cancellationToken);
+
+        if (scrapedOpportunities.Count == 0)
+        {
+            return Results.Ok(new { message = "No se encontraron oportunidades en SEACE.", count = 0 });
+        }
+
+        // Convertir scraped opportunities a Opportunities y guardar en BD
+        int savedCount = 0;
+        foreach (var scraped in scrapedOpportunities)
+        {
+            var opportunity = new Opportunity
+            {
+                ProcessCode = scraped.ProcessCode,
+                Title = scraped.Title,
+                EntityName = scraped.EntityName,
+                EstimatedAmount = scraped.EstimatedAmount,
+                ClosingDate = scraped.ClosingDate,
+                Category = scraped.Category,
+                Modality = scraped.Modality,
+                MatchScore = 50, // Valor por defecto hasta que se calcule con IA
+                Summary = scraped.Description,
+                Location = "Lima", // Valor por defecto
+                IsPriority = false,
+                PublishedDate = scraped.PublishedDate
+            };
+
+            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+            savedCount++;
+        }
+
+        Console.WriteLine($"[SeaceScraper] Se guardaron {savedCount} oportunidades.");
+
+        return Results.Ok(new { message = $"Scraping completado. Se guardaron {savedCount} oportunidades.", count = savedCount });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[SeaceScraper] Error: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo completar el scraping de SEACE.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// SEACE CSV upload endpoint
+app.MapPost("/api/seace/upload-csv", async (
+    IFormFile file,
+    OpportunityRepository repository,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        if (file == null || file.Length == 0)
+        {
+            return Results.BadRequest(new { message = "No se proporcionó archivo CSV." });
+        }
+
+        Console.WriteLine($"[SeaceCSV] Procesando archivo CSV: {file.FileName} ({file.Length} bytes)");
+
+        using var reader = new StreamReader(file.OpenReadStream());
+        using var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture);
+        
+        var records = csv.GetRecords<dynamic>();
+        int savedCount = 0;
+
+        foreach (var record in records)
+        {
+            try
+            {
+                var opportunity = new Opportunity
+                {
+                    ProcessCode = record.NumProceso ?? record.process_code ?? "",
+                    Title = record.Nomenclatura ?? record.title ?? "",
+                    EntityName = record.Entidad ?? record.entity_name ?? "",
+                    EstimatedAmount = Convert.ToDecimal(record.ValorReferencial ?? record.estimated_amount ?? 0),
+                    ClosingDate = record.FechaConvocatoria != null ? DateTime.Parse(record.FechaConvocatoria.ToString()) : DateTime.Now.AddDays(30),
+                    Category = record.Objeto ?? record.category ?? "Servicios",
+                    Modality = record.Modalidad ?? record.modality ?? "Licitación Pública",
+                    MatchScore = 50,
+                    Summary = record.Descripcion ?? record.summary ?? "",
+                    Location = "Lima",
+                    IsPriority = false,
+                    PublishedDate = DateTime.Now // Valor por defecto para CSV
+                };
+
+                await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+                savedCount++;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[SeaceCSV] Error al procesar registro: {ex.Message}");
+            }
+        }
+
+        Console.WriteLine($"[SeaceCSV] Se guardaron {savedCount} oportunidades del CSV.");
+
+        return Results.Ok(new { message = $"CSV procesado. Se guardaron {savedCount} oportunidades.", count = savedCount });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[SeaceCSV] Error: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo procesar el archivo CSV.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// OECE data download endpoint
+app.MapGet("/api/oece/download", async (
+    OeceApiService oeceApiService,
+    OpportunityRepository repository,
+    [FromQuery] DateTime? fromDate = null,
+    CancellationToken cancellationToken = default) =>
+{
+    try
+    {
+        Console.WriteLine($"[OeceApi] Iniciando descarga de datos de OECE API REST...");
+        if (fromDate.HasValue)
+        {
+            Console.WriteLine($"[OeceApi] Filtrando por fecha de publicación desde: {fromDate:yyyy-MM-dd}");
+        }
+
+        var oeceOpportunities = await oeceApiService.DownloadOeceDataAsync(maxPages: 50, fromDate, cancellationToken, null);
+
+        if (oeceOpportunities.Count == 0)
+        {
+            return Results.Ok(new { message = "No se encontraron oportunidades en OECE.", count = 0 });
+        }
+
+        // Convertir oece opportunities a Opportunities y guardar en BD
+        int savedCount = 0;
+        int skippedCount = 0;
+        foreach (var oece in oeceOpportunities)
+        {
+            // Verificar si ya existe una oportunidad con el mismo ProcessCode
+            var existing = await repository.GetByProcessCodeAsync(oece.ProcessCode, cancellationToken);
+            if (existing != null)
+            {
+                skippedCount++;
+                continue;
+            }
+
+            var opportunity = new Opportunity
+            {
+                ProcessCode = oece.ProcessCode,
+                Title = oece.Title,
+                EntityName = oece.EntityName,
+                EstimatedAmount = oece.EstimatedAmount,
+                ClosingDate = oece.ClosingDate ?? DateTime.Now.AddDays(30),
+                Category = oece.Category,
+                Modality = oece.Modality,
+                MatchScore = 50, // Valor por defecto hasta que se calcule con IA
+                Summary = oece.Description,
+                Location = "Lima", // Valor por defecto
+                IsPriority = false,
+                PublishedDate = oece.PublishedDate
+            };
+
+            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+            savedCount++;
+        }
+
+        Console.WriteLine($"[OeceApi] Se guardaron {savedCount} oportunidades. Se omitieron {skippedCount} duplicados.");
+
+        return Results.Ok(new { message = $"Datos de OECE descargados. Se guardaron {savedCount} oportunidades. Se omitieron {skippedCount} duplicados.", count = savedCount, skipped = skippedCount });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[OeceApi] Error: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo descargar datos de OECE.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// OECE refresh endpoint - clear DB and download only the most recent opportunities
+app.MapPost("/api/oece/refresh", async (
+    OeceApiService oeceApiService,
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int maxResults = 100) =>
+{
+    try
+    {
+        Console.WriteLine($"[OeceApi] Iniciando refresh de OECE - limpiando BD y descargando {maxResults} oportunidades más recientes...");
+
+        // Limpiar todas las oportunidades existentes
+        await repository.ClearAllOpportunitiesAsync(cancellationToken);
+        Console.WriteLine($"[OeceApi] Base de datos limpiada.");
+
+        // Descargar solo las N oportunidades más recientes
+        var oeceOpportunities = await oeceApiService.DownloadOeceDataAsync(maxPages: 10, null, cancellationToken, maxResults);
+
+        if (oeceOpportunities.Count == 0)
+        {
+            return Results.Ok(new { message = "No se encontraron oportunidades en OECE.", count = 0 });
+        }
+
+        // Guardar las oportunidades
+        int savedCount = 0;
+        foreach (var oece in oeceOpportunities)
+        {
+            var opportunity = new Opportunity
+            {
+                ProcessCode = oece.ProcessCode,
+                Title = oece.Title,
+                EntityName = oece.EntityName,
+                EstimatedAmount = oece.EstimatedAmount,
+                ClosingDate = oece.ClosingDate ?? DateTime.Now.AddDays(30),
+                Category = oece.Category,
+                Modality = oece.Modality,
+                MatchScore = 50,
+                Summary = oece.Description,
+                Location = "Lima",
+                IsPriority = false,
+                PublishedDate = oece.PublishedDate
+            };
+
+            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+            savedCount++;
+        }
+
+        Console.WriteLine($"[OeceApi] Refresh completado. Se guardaron {savedCount} oportunidades más recientes.");
+
+        return Results.Ok(new { message = $"Refresh completado. Se guardaron {savedCount} oportunidades más recientes.", count = savedCount });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[OeceApi] Error en refresh: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo completar el refresh.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// SEACE download endpoint - download data directly from SEACE
+app.MapPost("/api/seace/download", async (
+    SeaceScraperService seaceScraperService,
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int maxResults = 100) =>
+{
+    try
+    {
+        Console.WriteLine($"[SeaceScraper] Iniciando descarga de datos de SEACE - {maxResults} oportunidades...");
+
+        // Descargar datos de SEACE
+        var seaceOpportunities = await seaceScraperService.ScrapeOpportunitiesAsync(maxResults, cancellationToken);
+
+        if (seaceOpportunities.Count == 0)
+        {
+            return Results.Ok(new { message = "No se encontraron oportunidades en SEACE.", count = 0 });
+        }
+
+        // Guardar las oportunidades
+        int savedCount = 0;
+        int skippedCount = 0;
+        foreach (var seace in seaceOpportunities)
+        {
+            // Verificar si ya existe por código de proceso
+            var existing = await repository.GetByProcessCodeAsync(seace.ProcessCode, cancellationToken);
+            if (existing != null)
+            {
+                skippedCount++;
+                continue;
+            }
+
+            var opportunity = new Opportunity
+            {
+                ProcessCode = seace.ProcessCode,
+                Title = seace.Title,
+                EntityName = seace.EntityName,
+                EstimatedAmount = seace.EstimatedAmount,
+                ClosingDate = seace.ClosingDate != default ? seace.ClosingDate : (seace.PublishedDate?.AddDays(30) ?? DateTime.Now.AddDays(30)),
+                Category = seace.Category,
+                Modality = seace.Modality,
+                MatchScore = 50,
+                Summary = seace.Description,
+                Location = "Lima",
+                IsPriority = false,
+                PublishedDate = seace.PublishedDate
+            };
+
+            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+            savedCount++;
+        }
+
+        Console.WriteLine($"[SeaceScraper] Descarga completada. Se guardaron {savedCount} oportunidades. Duplicados omitidos: {skippedCount}.");
+
+        return Results.Ok(new { message = $"Descarga completada. Se guardaron {savedCount} oportunidades de SEACE.", count = savedCount, skipped = skippedCount });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[SeaceScraper] Error en descarga: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo descargar datos de SEACE.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// SEACE refresh endpoint - clear DB and download from SEACE
+app.MapPost("/api/seace/refresh", async (
+    SeaceScraperService seaceScraperService,
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int maxResults = 30) =>
+{
+    try
+    {
+        Console.WriteLine($"[SeaceScraper] Iniciando refresh de SEACE - limpiando BD y descargando {maxResults} oportunidades...");
+
+        // Limpiar todas las oportunidades existentes
+        await repository.ClearAllOpportunitiesAsync(cancellationToken);
+        Console.WriteLine($"[SeaceScraper] Base de datos limpiada.");
+
+        // Descargar datos de SEACE
+        var seaceOpportunities = await seaceScraperService.ScrapeOpportunitiesAsync(maxResults, cancellationToken);
+
+        if (seaceOpportunities.Count == 0)
+        {
+            return Results.Ok(new { message = "No se encontraron oportunidades en SEACE.", count = 0 });
+        }
+
+        // Guardar las oportunidades
+        int savedCount = 0;
+        int skippedCount = 0;
+        foreach (var seace in seaceOpportunities)
+        {
+            // Verificar si ya existe por código de proceso
+            var existing = await repository.GetByProcessCodeAsync(seace.ProcessCode, cancellationToken);
+            if (existing != null)
+            {
+                Console.WriteLine($"[SeaceScraper] Duplicado omitido: {seace.ProcessCode}");
+                skippedCount++;
+                continue;
+            }
+
+            var opportunity = new Opportunity
+            {
+                ProcessCode = seace.ProcessCode,
+                Title = seace.Title,
+                EntityName = seace.EntityName,
+                EstimatedAmount = seace.EstimatedAmount,
+                ClosingDate = seace.ClosingDate,
+                Category = seace.Category,
+                Modality = seace.Modality,
+                MatchScore = 50,
+                Summary = seace.Description,
+                Location = "Lima",
+                IsPriority = false,
+                PublishedDate = seace.PublishedDate
+            };
+
+            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+            savedCount++;
+            Console.WriteLine($"[SeaceScraper] Guardada: {seace.ProcessCode}");
+        }
+
+        Console.WriteLine($"[SeaceScraper] Refresh completado. Se guardaron {savedCount} oportunidades. Duplicados omitidos: {skippedCount}.");
+
+        return Results.Ok(new { message = $"Refresh completado. Se guardaron {savedCount} oportunidades de SEACE.", count = savedCount, skipped = skippedCount });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[SeaceScraper] Error en refresh: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo completar el refresh.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// CSV Import endpoint - import data from manually downloaded SEACE CSV
+app.MapPost("/api/opportunities/import-csv", async (
+    CsvImportService csvImportService,
+    HttpRequest request,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        using var reader = new StreamReader(request.Body);
+        var csvContent = await reader.ReadToEndAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(csvContent))
+        {
+            return Results.BadRequest(new { message = "No se proporcionó contenido CSV" });
+        }
+
+        Console.WriteLine($"[CsvImport] Importando CSV de SEACE ({csvContent.Length} caracteres)...");
+
+        var (imported, skipped, errors) = await csvImportService.ImportFromCsvAsync(csvContent, cancellationToken);
+
+        Console.WriteLine($"[CsvImport] Importación completada. Importados: {imported}, Omitidos: {skipped}, Errores: {errors.Count}");
+
+        return Results.Ok(new
+        {
+            message = $"Importación completada. {imported} registros importados, {skipped} omitidos.",
+            imported,
+            skipped,
+            errors = errors.Count > 0 ? errors : null
+        });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[CsvImport] Error: {ex.Message}");
+        return Results.Problem(
+            title: "Error al importar CSV",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// OECE incremental update endpoint - download only new data since last update
+app.MapGet("/api/oece/update-incremental", async (
+    OeceApiService oeceApiService,
+    OpportunityRepository repository,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        Console.WriteLine($"[OeceApi] Iniciando actualización incremental de OECE...");
+
+        // Obtener la fecha de publicación más reciente en la base de datos
+        var latestDate = await repository.GetLatestPublishedDateAsync(cancellationToken);
+
+        if (latestDate == null)
+        {
+            Console.WriteLine($"[OeceApi] No hay datos en la base de datos. Descargando todos los datos...");
+            // Si no hay datos, descargar todo (sin filtro de fecha)
+            var oeceOpportunities = await oeceApiService.DownloadOeceDataAsync(maxPages: 50, null, cancellationToken, null);
+
+            if (oeceOpportunities.Count == 0)
+            {
+                return Results.Ok(new { message = "No se encontraron oportunidades en OECE.", count = 0 });
+            }
+
+            int savedCount = 0;
+            foreach (var oece in oeceOpportunities)
+            {
+                var opportunity = new Opportunity
+                {
+                    ProcessCode = oece.ProcessCode,
+                    Title = oece.Title,
+                    EntityName = oece.EntityName,
+                    EstimatedAmount = oece.EstimatedAmount,
+                    ClosingDate = oece.ClosingDate ?? DateTime.Now.AddDays(30),
+                    Category = oece.Category,
+                    Modality = oece.Modality,
+                    MatchScore = 50,
+                    Summary = oece.Description,
+                    Location = "Lima",
+                    IsPriority = false,
+                    PublishedDate = oece.PublishedDate
+                };
+
+                await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+                savedCount++;
+            }
+
+            Console.WriteLine($"[OeceApi] Se guardaron {savedCount} oportunidades (descarga inicial).");
+            return Results.Ok(new { message = $"Descarga inicial completada. Se guardaron {savedCount} oportunidades.", count = savedCount, isInitial = true });
+        }
+
+        Console.WriteLine($"[OeceApi] Fecha más reciente en BD: {latestDate:yyyy-MM-dd}");
+        Console.WriteLine($"[OeceApi] Descargando solo datos posteriores a esta fecha...");
+
+        // Descargar solo datos posteriores a la fecha más reciente
+        var fromDate = latestDate.Value.AddDays(-1); // Incluir un día antes para no perder datos del mismo día
+        var newOpportunities = await oeceApiService.DownloadOeceDataAsync(maxPages: 50, fromDate, cancellationToken, null);
+
+        if (newOpportunities.Count == 0)
+        {
+            Console.WriteLine($"[OeceApi] No hay datos nuevos desde la última actualización.");
+            return Results.Ok(new { message = "No hay datos nuevos desde la última actualización.", count = 0, isInitial = false });
+        }
+
+        // Guardar solo las oportunidades nuevas
+        int newSavedCount = 0;
+        int skippedCount = 0;
+        foreach (var oece in newOpportunities)
+        {
+            var existing = await repository.GetByProcessCodeAsync(oece.ProcessCode, cancellationToken);
+            if (existing != null)
+            {
+                skippedCount++;
+                continue;
+            }
+
+            var opportunity = new Opportunity
+            {
+                ProcessCode = oece.ProcessCode,
+                Title = oece.Title,
+                EntityName = oece.EntityName,
+                EstimatedAmount = oece.EstimatedAmount,
+                ClosingDate = oece.ClosingDate ?? DateTime.Now.AddDays(30),
+                Category = oece.Category,
+                Modality = oece.Modality,
+                MatchScore = 50,
+                Summary = oece.Description,
+                Location = "Lima",
+                IsPriority = false,
+                PublishedDate = oece.PublishedDate
+            };
+
+            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+            newSavedCount++;
+        }
+
+        Console.WriteLine($"[OeceApi] Actualización incremental completada. Nuevas oportunidades: {newSavedCount}. Duplicados omitidos: {skippedCount}.");
+
+        return Results.Ok(new { message = $"Actualización incremental completada. Se guardaron {newSavedCount} nuevas oportunidades. Se omitieron {skippedCount} duplicados.", count = newSavedCount, skipped = skippedCount, isInitial = false });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[OeceApi] Error en actualización incremental: {ex.Message}");
+        return Results.Problem(
+            title: "No se pudo completar la actualización incremental.",
+            detail: ex.Message,
             statusCode: StatusCodes.Status500InternalServerError);
     }
 });
@@ -530,6 +1169,27 @@ app.MapGet("/api/auth/google/callback", async (
     }
 });
 
+// Endpoint para iniciar actualización automática de OECE
+app.MapPost("/api/oece/start-auto-update", async (OeceDataService oeceService, OpportunityRepository repository) =>
+{
+    try
+    {
+        Console.WriteLine("[AutoUpdate] Iniciando actualización automática de OECE en background...");
+        
+        // Iniciar tarea en background
+        _ = Task.Run(async () => await AutoUpdateOeceData(oeceService, repository));
+        
+        return Results.Ok(new { message = "Actualización automática iniciada. Se actualizará cada 7 días." });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudo iniciar la actualización automática",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
 app.Run();
 
 static Dictionary<string, string[]> ValidateRegisterRequest(RegisterRequest request)
@@ -696,3 +1356,61 @@ static string? FindFrontendRoot(string startPath)
     Console.WriteLine($"[StaticFiles] WARNING: Could not find home.html. Searched from: {startPath}");
     return null;
 }
+
+static async Task AutoUpdateOeceData(OeceDataService oeceService, OpportunityRepository repository)
+{
+    while (true)
+    {
+        try
+        {
+            Console.WriteLine("[AutoUpdate] Descargando datos de OECE...");
+            
+            int currentYear = DateTime.Now.Year;
+            var oeceOpportunities = await oeceService.DownloadOeceDataAsync(currentYear);
+
+            if (oeceOpportunities.Count > 0)
+            {
+                int savedCount = 0;
+                foreach (var oece in oeceOpportunities)
+                {
+                    var opportunity = new Opportunity
+                    {
+                        ProcessCode = oece.ProcessCode,
+                        Title = oece.Title,
+                        EntityName = oece.EntityName,
+                        EstimatedAmount = oece.EstimatedAmount,
+                        ClosingDate = oece.ClosingDate,
+                        Category = oece.Category,
+                        Modality = oece.Modality,
+                        MatchScore = 50,
+                        Summary = oece.Description,
+                        Location = "Lima",
+                        IsPriority = false,
+                        PublishedDate = oece.PublishedDate
+                    };
+
+                    await repository.InsertOpportunityAsync(opportunity, CancellationToken.None);
+                    savedCount++;
+                }
+
+                Console.WriteLine($"[AutoUpdate] Se guardaron {savedCount} oportunidades automáticamente.");
+            }
+            else
+            {
+                Console.WriteLine("[AutoUpdate] No se encontraron oportunidades en OECE.");
+            }
+
+            // Esperar 7 días
+            Console.WriteLine("[AutoUpdate] Próxima actualización en 7 días...");
+            await Task.Delay(TimeSpan.FromDays(7));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AutoUpdate] Error: {ex.Message}");
+            Console.WriteLine("[AutoUpdate] Reintentando en 1 hora...");
+            await Task.Delay(TimeSpan.FromHours(1));
+        }
+    }
+}
+
+

@@ -1,0 +1,14 @@
+{
+  "name": "seace-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for SEACE using Puppeteer with stealth",
+  "main": "seace-scraper.js",
+  "scripts": {
+    "start": "node seace-scraper.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

@@ -44,6 +44,24 @@ if (authForm) {
       if (!response.ok) {
         const validationMessage = readValidationMessage(data);
         const errorMessage = validationMessage || data.message || "No se pudo completar la solicitud.";
+        
+        // Handle account lockout
+        if (data.isLocked) {
+          setStatus(errorMessage, "error");
+          // Disable submit button temporarily
+          submitButton.disabled = true;
+          setTimeout(() => {
+            submitButton.disabled = false;
+          }, 10 * 1000); // 10 seconds
+          return;
+        }
+        
+        // Show remaining attempts if available
+        if (data.remainingAttempts !== undefined) {
+          setStatus(`${errorMessage} (${data.remainingAttempts} intentos restantes)`, "error");
+          return;
+        }
+        
         setStatus(errorMessage, "error");
         return;
       }

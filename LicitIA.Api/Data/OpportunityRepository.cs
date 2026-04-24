@@ -30,9 +30,10 @@ public sealed class OpportunityRepository
                 MatchScore,
                 Summary,
                 Location,
-                IsPriority
+                IsPriority,
+                PublishedDate
             FROM dbo.Opportunities
-            ORDER BY MatchScore DESC, ClosingDate ASC, OpportunityId ASC;
+            ORDER BY PublishedDate DESC, OpportunityId DESC;
             """;
 
         await using var command = new SqlCommand(sql, connection);
@@ -65,7 +66,8 @@ public sealed class OpportunityRepository
                 MatchScore,
                 Summary,
                 Location,
-                IsPriority
+                IsPriority,
+                PublishedDate
             FROM dbo.Opportunities
             WHERE OpportunityId = @OpportunityId;
             """;
@@ -82,6 +84,130 @@ public sealed class OpportunityRepository
         return MapOpportunity(reader);
     }
 
+    public async Task<Opportunity?> GetByProcessCodeAsync(string processCode, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            SELECT TOP (1)
+                OpportunityId,
+                ProcessCode,
+                Title,
+                EntityName,
+                EstimatedAmount,
+                ClosingDate,
+                Category,
+                Modality,
+                MatchScore,
+                Summary,
+                Location,
+                IsPriority,
+                PublishedDate
+            FROM dbo.Opportunities
+            WHERE ProcessCode = @ProcessCode;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@ProcessCode", processCode);
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        if (!await reader.ReadAsync(cancellationToken))
+        {
+            return null;
+        }
+
+        return MapOpportunity(reader);
+    }
+
+    public async Task<DateTime?> GetLatestPublishedDateAsync(CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            SELECT MAX(PublishedDate) AS LatestPublishedDate
+            FROM dbo.Opportunities
+            WHERE PublishedDate IS NOT NULL;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        var result = await command.ExecuteScalarAsync(cancellationToken);
+
+        if (result == null || result == DBNull.Value)
+        {
+            return null;
+        }
+
+        return (DateTime)result;
+    }
+
+    public async Task InsertOpportunityAsync(Opportunity opportunity, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            INSERT INTO dbo.Opportunities
+            (
+                ProcessCode,
+                Title,
+                EntityName,
+                EstimatedAmount,
+                ClosingDate,
+                Category,
+                Modality,
+                MatchScore,
+                Summary,
+                Location,
+                IsPriority,
+                PublishedDate
+            )
+            VALUES
+            (
+                @ProcessCode,
+                @Title,
+                @EntityName,
+                @EstimatedAmount,
+                @ClosingDate,
+                @Category,
+                @Modality,
+                @MatchScore,
+                @Summary,
+                @Location,
+                @IsPriority,
+                @PublishedDate
+            );
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@ProcessCode", opportunity.ProcessCode);
+        command.Parameters.AddWithValue("@Title", opportunity.Title);
+        command.Parameters.AddWithValue("@EntityName", opportunity.EntityName);
+        command.Parameters.AddWithValue("@EstimatedAmount", opportunity.EstimatedAmount);
+        command.Parameters.AddWithValue("@ClosingDate", opportunity.ClosingDate);
+        command.Parameters.AddWithValue("@Category", opportunity.Category);
+        command.Parameters.AddWithValue("@Modality", opportunity.Modality);
+        command.Parameters.AddWithValue("@MatchScore", opportunity.MatchScore);
+        command.Parameters.AddWithValue("@Summary", opportunity.Summary);
+        command.Parameters.AddWithValue("@Location", opportunity.Location);
+        command.Parameters.AddWithValue("@IsPriority", opportunity.IsPriority);
+        command.Parameters.AddWithValue("@PublishedDate", opportunity.PublishedDate);
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task ClearAllOpportunitiesAsync(CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = "DELETE FROM dbo.Opportunities;";
+
+        await using var command = new SqlCommand(sql, connection);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private static Opportunity MapOpportunity(SqlDataReader reader) =>
         new()
         {
@@ -96,6 +222,7 @@ public sealed class OpportunityRepository
             MatchScore = reader.GetInt32(reader.GetOrdinal("MatchScore")),
             Summary = reader.GetString(reader.GetOrdinal("Summary")),
             Location = reader.GetString(reader.GetOrdinal("Location")),
-            IsPriority = reader.GetBoolean(reader.GetOrdinal("IsPriority"))
+            IsPriority = reader.GetBoolean(reader.GetOrdinal("IsPriority")),
+            PublishedDate = reader.IsDBNull(reader.GetOrdinal("PublishedDate")) ? null : reader.GetDateTime(reader.GetOrdinal("PublishedDate"))
         };
 }

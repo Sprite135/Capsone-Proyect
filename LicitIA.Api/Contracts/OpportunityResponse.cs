@@ -28,6 +28,8 @@ public sealed class OpportunityResponse
 
     public bool IsPriority { get; init; }
 
+    public DateTime? PublishedDate { get; init; }
+
     public static OpportunityResponse FromModel(Opportunity opportunity) =>
         new()
         {
@@ -42,6 +44,7 @@ public sealed class OpportunityResponse
             MatchScore = opportunity.MatchScore,
             Summary = opportunity.Summary,
             Location = opportunity.Location,
-            IsPriority = opportunity.IsPriority
+            IsPriority = opportunity.IsPriority,
+            PublishedDate = opportunity.PublishedDate
         };
 }

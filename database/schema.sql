@@ -39,18 +39,40 @@ BEGIN
         Category NVARCHAR(100) NOT NULL,
         Modality NVARCHAR(100) NOT NULL,
         MatchScore INT NOT NULL,
-        Summary NVARCHAR(2000) NOT NULL,
+        Summary NVARCHAR(4000) NOT NULL,
         Location NVARCHAR(100) NOT NULL,
-        IsPriority BIT NOT NULL DEFAULT 0
+        IsPriority BIT NOT NULL DEFAULT 0,
+        PublishedDate DATETIME2 NOT NULL
     );
     
     CREATE INDEX IX_Opportunities_MatchScore ON dbo.Opportunities(MatchScore DESC);
     CREATE INDEX IX_Opportunities_ClosingDate ON dbo.Opportunities(ClosingDate ASC);
+    CREATE INDEX IX_Opportunities_PublishedDate ON dbo.Opportunities(PublishedDate DESC);
     PRINT 'Tabla Opportunities creada exitosamente.';
 END
 ELSE
 BEGIN
     PRINT 'Tabla Opportunities ya existe.';
+END
+
+-- Crear tabla LoginAttempts
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'LoginAttempts')
+BEGIN
+    CREATE TABLE dbo.LoginAttempts (
+        AttemptId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        Email NVARCHAR(256) NOT NULL,
+        AttemptTimeUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        Success BIT NOT NULL DEFAULT 0,
+        IpAddress NVARCHAR(50) NULL
+    );
+    
+    CREATE INDEX IX_LoginAttempts_Email ON dbo.LoginAttempts(Email);
+    CREATE INDEX IX_LoginAttempts_AttemptTimeUtc ON dbo.LoginAttempts(AttemptTimeUtc);
+    PRINT 'Tabla LoginAttempts creada exitosamente.';
+END
+ELSE
+BEGIN
+    PRINT 'Tabla LoginAttempts ya existe.';
 END
 
 -- Insertar datos de ejemplo en Opportunities

@@ -229,6 +229,74 @@ public sealed class AuthRepository
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
+    public async Task RecordLoginAttemptAsync(string email, bool success, string? ipAddress, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            INSERT INTO dbo.LoginAttempts
+            (
+                Email,
+                AttemptTimeUtc,
+                Success,
+                IpAddress
+            )
+            VALUES
+            (
+                @Email,
+                @AttemptTimeUtc,
+                @Success,
+                @IpAddress
+            );
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@Email", NormalizeEmail(email));
+        command.Parameters.AddWithValue("@AttemptTimeUtc", DateTime.UtcNow);
+        command.Parameters.AddWithValue("@Success", success);
+        command.Parameters.AddWithValue("@IpAddress", (object?)ipAddress ?? DBNull.Value);
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    public async Task<int> GetFailedLoginAttemptsAsync(string email, TimeSpan timeWindow, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            SELECT COUNT(*)
+            FROM dbo.LoginAttempts
+            WHERE Email = @Email
+              AND Success = 0
+              AND AttemptTimeUtc > @CutoffTimeUtc;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@Email", NormalizeEmail(email));
+        command.Parameters.AddWithValue("@CutoffTimeUtc", DateTime.UtcNow.Subtract(timeWindow));
+
+        var result = await command.ExecuteScalarAsync(cancellationToken);
+        return result != null ? Convert.ToInt32(result) : 0;
+    }
+
+    public async Task CleanupOldLoginAttemptsAsync(CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = """
+            DELETE FROM dbo.LoginAttempts
+            WHERE AttemptTimeUtc < @CutoffTimeUtc;
+            """;
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@CutoffTimeUtc", DateTime.UtcNow.AddDays(-30));
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private static AppUser MapUser(SqlDataReader reader) =>
         new()
         {

@@ -1,4 +1,96 @@
+# Build outputs
 LicitIA.Api/bin/
 LicitIA.Api/obj/
+*.dll
+*.exe
+*.pdb
+
+# Visual Studio
+.vs/
 *.user
-LicitIA.Api/appsettings.json
+*.suo
+*.userosscache
+*.sln.docstates
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Data files
+*.jsonl
+*.jsonl.gz
+*.csv
+oece-*.jsonl
+pagina2_seace.png
+seace-screenshot.png
+
+# Scripts temporales
+auto-update-oece.ps1
+view-oece-format.ps1
+
+# Node modules (scrapers)
+scrapers/node_modules/
+
+# Configuración sensible
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
+NuGet.Config

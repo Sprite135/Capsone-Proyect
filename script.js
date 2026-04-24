@@ -20,8 +20,12 @@ const detailModality = document.getElementById("detailModality");
 const detailStatus = document.getElementById("detailStatus");
 const detailLocation = document.getElementById("detailLocation");
 const detailUrgency = document.getElementById("detailUrgency");
+const syncSeaceButton = Array.from(document.querySelectorAll('button')).find(btn => btn.textContent.includes('Sincronizar SEACE'));
 
 let allOpportunities = [];
+let currentPage = 1;
+const itemsPerPage = 15;
+let lastFilteredCount = 0;
 
 const setMessage = (text) => {
   if (message) {
@@ -34,6 +38,36 @@ demoButtons.forEach((button) => {
     setMessage(button.dataset.demoMessage);
   });
 });
+
+// Conectar botón Sincronizar SEACE al endpoint de refresh
+if (syncSeaceButton) {
+  syncSeaceButton.addEventListener("click", async () => {
+    try {
+      syncSeaceButton.disabled = true;
+      syncSeaceButton.textContent = "Sincronizando...";
+      setMessage("Iniciando sincronización con SEACE...");
+
+      const response = await fetch(`${API_BASE}/api/seace/refresh`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al sincronizar con SEACE");
+      }
+
+      const data = await response.json();
+      setMessage(data.message || "Sincronización completada exitosamente");
+      
+      // Recargar oportunidades
+      await loadOpportunities();
+    } catch (error) {
+      setMessage("Error al sincronizar con SEACE: " + error.message);
+    } finally {
+      syncSeaceButton.disabled = false;
+      syncSeaceButton.textContent = "Sincronizar SEACE";
+    }
+  });
+}
 
 chips.forEach((chip) => {
   chip.addEventListener("click", () => {
@@ -49,11 +83,139 @@ chips.forEach((chip) => {
   });
 });
 
+// Event listener for custom amount range filter
+const applyAmountFilterBtn = document.getElementById('applyAmountFilter');
+if (applyAmountFilterBtn) {
+  applyAmountFilterBtn.addEventListener('click', () => {
+    renderOpportunities();
+    setMessage('Filtro de monto aplicado.');
+  });
+}
+
+// Event listener for clear amount filter button
+const clearAmountFilterBtn = document.getElementById('clearAmountFilter');
+if (clearAmountFilterBtn) {
+  clearAmountFilterBtn.addEventListener('click', () => {
+    const minAmountInput = document.getElementById('minAmount');
+    const maxAmountInput = document.getElementById('maxAmount');
+    if (minAmountInput) minAmountInput.value = '';
+    if (maxAmountInput) maxAmountInput.value = '';
+    renderOpportunities();
+    setMessage('Filtro de monto borrado.');
+  });
+}
+
 if (opportunitySearch) {
   opportunitySearch.addEventListener("input", () => {
     renderOpportunities();
   });
 }
+
+// Favorite functionality
+function isOpportunityFavorite(opportunityId) {
+  const favorites = JSON.parse(localStorage.getItem('favoriteOpportunities') || '[]');
+  return favorites.includes(opportunityId);
+}
+
+function isOpportunityUrgent(closingDate) {
+  const now = new Date();
+  const closing = new Date(closingDate);
+  const diffTime = closing - now;
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+  return diffDays <= 7 && diffDays > 0;
+}
+
+function getOpportunityTrackingStatus(opportunityId) {
+  const trackingStatuses = JSON.parse(localStorage.getItem('trackingStatuses') || '{}');
+  return trackingStatuses[opportunityId] || '';
+}
+
+function setOpportunityTrackingStatus(opportunityId, status) {
+  const trackingStatuses = JSON.parse(localStorage.getItem('trackingStatuses') || '{}');
+  trackingStatuses[opportunityId] = status;
+  localStorage.setItem('trackingStatuses', JSON.stringify(trackingStatuses));
+}
+
+function getTrackingStatusClass(status) {
+  const statusClasses = {
+    'review': 'status-review',
+    'preparing': 'status-preparing',
+    'submitted': 'status-submitted',
+    'won': 'status-won',
+    'lost': 'status-lost'
+  };
+  return statusClasses[status] || '';
+}
+
+function toggleFavorite(opportunityId) {
+  const favorites = JSON.parse(localStorage.getItem('favoriteOpportunities') || '[]');
+  const index = favorites.indexOf(opportunityId);
+  
+  if (index > -1) {
+    favorites.splice(index, 1);
+    setMessage("Oportunidad eliminada de favoritos.");
+  } else {
+    favorites.push(opportunityId);
+    setMessage("Oportunidad agregada a favoritos.");
+  }
+  
+  localStorage.setItem('favoriteOpportunities', JSON.stringify(favorites));
+  renderOpportunities();
+}
+
+// Event delegation for favorite buttons
+document.addEventListener('click', (e) => {
+  const favoriteBtn = e.target.closest('.favorite-btn');
+  if (favoriteBtn) {
+    const opportunityId = parseInt(favoriteBtn.dataset.opportunityId);
+    if (opportunityId) {
+      toggleFavorite(opportunityId);
+    }
+  }
+});
+
+// Event delegation for tracking status dropdown
+document.addEventListener('change', (e) => {
+  const trackingSelect = e.target.closest('.tracking-status-select');
+  if (trackingSelect) {
+    const opportunityId = parseInt(trackingSelect.dataset.opportunityId);
+    const status = trackingSelect.value;
+    if (opportunityId) {
+      setOpportunityTrackingStatus(opportunityId, status);
+      setMessage(`Estado actualizado: ${trackingSelect.options[trackingSelect.selectedIndex].text}`);
+      renderOpportunities();
+    }
+  }
+});
+
+// Tab functionality for page-tabs
+const pageTabs = document.querySelectorAll('.page-tabs a');
+
+pageTabs.forEach(tab => {
+  tab.addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Update active state
+    pageTabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    // Update current tab
+    currentTab = tab.dataset.tab;
+    
+    // Update favorite filter chip
+    const favoriteFilterChips = document.querySelectorAll('.chip[data-filter-group="favorite"]');
+    favoriteFilterChips.forEach(chip => {
+      chip.classList.remove('active');
+      if (currentTab === 'favorites' && chip.dataset.filterValue === 'only') {
+        chip.classList.add('active');
+      } else if (currentTab !== 'favorites' && chip.dataset.filterValue === 'all') {
+        chip.classList.add('active');
+      }
+    });
+    
+    renderOpportunities();
+  });
+});
 
 if (opportunitiesContainer) {
   loadOpportunities();
@@ -79,6 +241,9 @@ async function loadOpportunities() {
     allOpportunities = Array.isArray(data) ? data : [];
     updateOpportunitySummary();
     renderOpportunities();
+    
+    // Cargar filtros dinámicos
+    loadDynamicFilters();
   } catch (error) {
     if (opportunitiesContainer) {
       opportunitiesContainer.innerHTML = `
@@ -93,6 +258,154 @@ async function loadOpportunities() {
 
     setMessage("No fue posible cargar las oportunidades desde la API.");
   }
+}
+
+async function loadDynamicFilters() {
+  try {
+    // Cargar categorías
+    const categoriesResponse = await fetch('http://localhost:5153/api/opportunities/categories');
+    if (categoriesResponse.ok) {
+      const categoriesData = await categoriesResponse.json();
+      
+      if (categoriesData.categories && Array.isArray(categoriesData.categories)) {
+        renderCategoryFilters(categoriesData.categories);
+      }
+    }
+    
+    // Cargar modalidades
+    const modalitiesResponse = await fetch('http://localhost:5153/api/opportunities/modalities');
+    if (modalitiesResponse.ok) {
+      const modalitiesData = await modalitiesResponse.json();
+      
+      if (modalitiesData.modalities && Array.isArray(modalitiesData.modalities)) {
+        renderModalityFilters(modalitiesData.modalities);
+      }
+    }
+  } catch (error) {
+    console.error("Error cargando filtros dinámicos:", error);
+  }
+}
+
+function renderCategoryFilters(categories) {
+  // Buscar específicamente el filtro de "Rubros"
+  const rubrosFilterGroup = Array.from(document.querySelectorAll('.filter-group h4'))
+    .find(h4 => h4.textContent === 'Rubros')?.parentElement;
+  
+  if (!rubrosFilterGroup) return;
+  const chipRow = rubrosFilterGroup.querySelector('.chip-row');
+  if (!chipRow) return;
+  
+  // Limpiar completamente todos los filtros existentes
+  chipRow.innerHTML = '';
+  
+  // Agregar "Todos" primero
+  const todosChip = document.createElement('button');
+  todosChip.className = 'chip active';
+  todosChip.type = 'button';
+  todosChip.dataset.filterGroup = 'category';
+  todosChip.dataset.filterValue = 'Todos';
+  todosChip.innerHTML = `Todos <span class="chip-count" id="count-Todos">${allOpportunities.length}</span>`;
+  todosChip.addEventListener('click', () => {
+    const group = todosChip.closest('.chip-row');
+    if (group) {
+      group.querySelectorAll('.chip').forEach((item) => item.classList.remove('active'));
+    }
+    todosChip.classList.add('active');
+    setMessage(`Filtro aplicado: Todos.`);
+    renderOpportunities();
+  });
+  chipRow.appendChild(todosChip);
+  
+  // Agregar categorías dinámicas
+  categories.forEach(category => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.type = 'button';
+    chip.dataset.filterGroup = 'category';
+    chip.dataset.filterValue = category;
+    
+    // Calcular count
+    const count = allOpportunities.filter(o => o.category === category).length;
+    
+    chip.innerHTML = `
+      ${category}
+      <span class="chip-count">${count}</span>
+    `;
+    
+    // Agregar event listener
+    chip.addEventListener('click', () => {
+      const group = chip.closest('.chip-row');
+      if (group) {
+        group.querySelectorAll('.chip').forEach((item) => item.classList.remove('active'));
+      }
+      chip.classList.add('active');
+      setMessage(`Filtro aplicado: ${category}.`);
+      renderOpportunities();
+    });
+    
+    chipRow.appendChild(chip);
+  });
+}
+
+function renderModalityFilters(modalities) {
+  const modalityFilterContainer = document.querySelector('[data-filter-group="modality"]')?.parentElement;
+  if (!modalityFilterContainer) return;
+  
+  const chipRow = modalityFilterContainer.querySelector('.chip-row');
+  if (!chipRow) return;
+  
+  // Si no existe el contenedor de modalidades, crearlo
+  if (!modalityFilterContainer) {
+    const filterGroup = document.createElement('div');
+    filterGroup.className = 'filter-group';
+    filterGroup.innerHTML = `
+      <h4>Modalidad</h4>
+      <div class="chip-row" id="modality-filters"></div>
+    `;
+    
+    const filtersContainer = document.querySelector('.filter-card');
+    if (filtersContainer) {
+      filtersContainer.appendChild(filterGroup);
+    }
+  }
+  
+  // Limpiar filtros existentes excepto "Todos"
+  const existingChips = chipRow.querySelectorAll('.chip');
+  existingChips.forEach(chip => {
+    if (chip.dataset.filterValue !== 'Todos') {
+      chip.remove();
+    }
+  });
+  
+  // Agregar modalidades dinámicas
+  modalities.forEach(modality => {
+    const chip = document.createElement('button');
+    chip.className = 'chip';
+    chip.type = 'button';
+    chip.dataset.filterGroup = 'modality';
+    chip.dataset.filterValue = modality;
+    
+    // Calcular count
+    const count = allOpportunities.filter(o => o.modality === modality).length;
+    
+    chip.innerHTML = `
+      ${modality}
+      <span class="chip-count" id="count-modality-${modality.replace(/\s+/g, '-')}">${count}</span>
+    `;
+    
+    // Agregar event listener
+    chip.addEventListener('click', () => {
+      const group = chip.closest('.chip-row');
+      if (group) {
+        group.querySelectorAll('.chip').forEach((item) => item.classList.remove('active'));
+      }
+      chip.classList.add('active');
+      setMessage(`Filtro aplicado: ${modality}.`);
+      renderOpportunities();
+    });
+    
+    chipRow.appendChild(chip);
+  });
 }
 
 async function loadOpportunityDetail() {
@@ -142,21 +455,46 @@ function renderOpportunities() {
 
   const categoryFilter = getActiveFilterValue("category");
   const locationFilter = getActiveFilterValue("location");
+  const favoriteFilter = getActiveFilterValue("favorite");
   const searchTerm = (opportunitySearch?.value || "").trim().toLowerCase();
+  
+  // Get custom amount range values
+  const minAmountInput = document.getElementById('minAmount');
+  const maxAmountInput = document.getElementById('maxAmount');
+  const minAmount = minAmountInput ? parseCurrencyInput(minAmountInput.value) : 0;
+  const maxAmount = maxAmountInput ? parseCurrencyInput(maxAmountInput.value) || Infinity : Infinity;
 
   const filtered = allOpportunities.filter((item) => {
     const matchesCategory =
       categoryFilter === "Todos" || item.category === categoryFilter;
     const matchesLocation =
       locationFilter === "Todos" || item.location === locationFilter;
+    const matchesFavorite =
+      favoriteFilter === "all" || (favoriteFilter === "only" && isOpportunityFavorite(item.opportunityId));
+    const matchesAmount = item.estimatedAmount >= minAmount && item.estimatedAmount <= maxAmount;
     const haystack = `${item.processCode} ${item.title} ${item.entityName} ${item.category} ${item.modality}`.toLowerCase();
     const matchesSearch = !searchTerm || haystack.includes(searchTerm);
 
-    return matchesCategory && matchesLocation && matchesSearch;
+    return matchesCategory && matchesLocation && matchesFavorite && matchesAmount && matchesSearch;
   });
 
+  // Update category counters
+  updateCategoryCounters();
+
+  // Reset to page 1 when filters change
+  if (filtered.length !== lastFilteredCount) {
+    currentPage = 1;
+    lastFilteredCount = filtered.length;
+  }
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = filtered.slice(startIndex, endIndex);
+
   if (opportunityMeta) {
-    opportunityMeta.textContent = `${filtered.length} oportunidades mostradas de ${allOpportunities.length} cargadas.`;
+    opportunityMeta.textContent = `${filtered.length} oportunidades mostradas de ${allOpportunities.length} cargadas. Página ${currentPage} de ${totalPages || 1}.`;
   }
 
   if (filtered.length === 0) {
@@ -167,7 +505,106 @@ function renderOpportunities() {
     return;
   }
 
-  opportunitiesContainer.innerHTML = filtered.map((item) => createOpportunityMarkup(item)).join("");
+  opportunitiesContainer.innerHTML = paginatedItems.map((item) => createOpportunityMarkup(item)).join("");
+
+  // Add pagination controls
+  renderPaginationControls(totalPages);
+}
+
+function renderPaginationControls(totalPages) {
+  if (totalPages <= 1) return;
+
+  const paginationContainer = document.createElement('div');
+  paginationContainer.className = 'pagination-controls';
+  
+  // Previous button
+  const prevButton = document.createElement('button');
+  prevButton.className = 'pagination-button';
+  prevButton.textContent = '← Anterior';
+  prevButton.disabled = currentPage === 1;
+  prevButton.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderOpportunities();
+    }
+  };
+  
+  // Page numbers
+  const pageNumbers = document.createElement('div');
+  pageNumbers.className = 'pagination-numbers';
+  
+  for (let i = 1; i <= totalPages; i++) {
+    const pageButton = document.createElement('button');
+    pageButton.className = `pagination-number ${i === currentPage ? 'active' : ''}`;
+    pageButton.textContent = i;
+    pageButton.onclick = () => {
+      currentPage = i;
+      renderOpportunities();
+    };
+    pageNumbers.appendChild(pageButton);
+  }
+  
+  // Next button
+  const nextButton = document.createElement('button');
+  nextButton.className = 'pagination-button';
+  nextButton.textContent = 'Siguiente →';
+  nextButton.disabled = currentPage === totalPages;
+  nextButton.onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderOpportunities();
+    }
+  };
+  
+  paginationContainer.appendChild(prevButton);
+  paginationContainer.appendChild(pageNumbers);
+  paginationContainer.appendChild(nextButton);
+  
+  opportunitiesContainer.appendChild(paginationContainer);
+}
+
+function matchesAmountRange(amount, range) {
+  switch (range) {
+    case 'low':
+      return amount <= 200000;
+    case 'medium':
+      return amount > 200000 && amount <= 500000;
+    case 'high':
+      return amount > 500000;
+    default:
+      return true;
+  }
+}
+
+function updateAmountCounters() {
+  const lowCount = allOpportunities.filter(o => o.estimatedAmount <= 200000).length;
+  const mediumCount = allOpportunities.filter(o => o.estimatedAmount > 200000 && o.estimatedAmount <= 500000).length;
+  const highCount = allOpportunities.filter(o => o.estimatedAmount > 500000).length;
+
+  const lowElement = document.getElementById('count-amount-low');
+  const mediumElement = document.getElementById('count-amount-medium');
+  const highElement = document.getElementById('count-amount-high');
+
+  if (lowElement) lowElement.textContent = lowCount;
+  if (mediumElement) mediumElement.textContent = mediumCount;
+  if (highElement) highElement.textContent = highCount;
+}
+
+function updateCategoryCounters() {
+  const categories = ['Todos', 'Software', 'Transformacion digital', 'Mesa de ayuda'];
+  
+  categories.forEach(category => {
+    const countElement = document.getElementById(`count-${category}`);
+    if (countElement) {
+      let count;
+      if (category === 'Todos') {
+        count = allOpportunities.length;
+      } else {
+        count = allOpportunities.filter(item => item.category === category).length;
+      }
+      countElement.textContent = count;
+    }
+  });
 }
 
 function renderOpportunityDetail(item) {
@@ -270,6 +707,14 @@ function createOpportunityMarkup(item) {
   const statusChip = item.isPriority
     ? '<span class="status active">Prioridad alta</span>'
     : '<span class="status review">Revision pendiente</span>';
+  const isFavorite = isOpportunityFavorite(item.opportunityId);
+  const favoriteClass = isFavorite ? 'active' : '';
+  const isUrgent = isOpportunityUrgent(item.closingDate);
+  const urgencyChip = isUrgent
+    ? '<span class="status critical">¡Vence pronto!</span>'
+    : '';
+  const trackingStatus = getOpportunityTrackingStatus(item.opportunityId);
+  const trackingStatusClass = getTrackingStatusClass(trackingStatus);
 
   return `
     <article class="result-card">
@@ -278,16 +723,34 @@ function createOpportunityMarkup(item) {
           <h4>${escapeHtml(item.processCode)} | ${escapeHtml(item.title)}</h4>
           <p>${escapeHtml(item.entityName)}</p>
         </div>
-        <span class="score ${scoreClass}">${item.matchScore}%</span>
+        <div class="result-header-actions">
+          <button class="favorite-btn ${favoriteClass}" data-opportunity-id="${item.opportunityId}" type="button" aria-label="Marcar como favorito">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </button>
+          <span class="score ${scoreClass}">${item.matchScore}%</span>
+        </div>
       </div>
       <div class="result-meta">
+        <div><span>Categoría</span><strong>${escapeHtml(item.category || 'N/A')}</strong></div>
         <div><span>Monto estimado</span><strong>${formatCurrency(item.estimatedAmount)}</strong></div>
         <div><span>Cierre</span><strong>${formatDate(item.closingDate)}</strong></div>
+        <div><span>Publicación</span><strong>${item.publishedDate ? formatDate(item.publishedDate) : 'N/A'}</strong></div>
         <div><span>Modalidad</span><strong>${escapeHtml(item.modality)}</strong></div>
       </div>
       <div class="result-foot">
         <p class="help-copy">${escapeHtml(item.summary)}</p>
         <div class="inline-actions">
+          ${urgencyChip}
+          <select class="tracking-status-select ${trackingStatusClass}" data-opportunity-id="${item.opportunityId}" aria-label="Estado de seguimiento">
+            <option value="">Sin estado</option>
+            <option value="review" ${trackingStatus === 'review' ? 'selected' : ''}>En revisión</option>
+            <option value="preparing" ${trackingStatus === 'preparing' ? 'selected' : ''}>Preparando propuesta</option>
+            <option value="submitted" ${trackingStatus === 'submitted' ? 'selected' : ''}>Postulado</option>
+            <option value="won" ${trackingStatus === 'won' ? 'selected' : ''}>Ganado</option>
+            <option value="lost" ${trackingStatus === 'lost' ? 'selected' : ''}>Perdido</option>
+          </select>
           ${statusChip}
           <a class="text-link" href="detalle-licitacion.html?id=${item.opportunityId}">Ver detalle</a>
         </div>
@@ -303,11 +766,35 @@ function formatCurrency(value) {
   }).format(value);
 }
 
+function formatCurrencyInput(input) {
+  // Remove non-digit characters except commas
+  let value = input.value.replace(/[^\d,]/g, '');
+  
+  // Remove existing commas
+  let numericValue = value.replace(/,/g, '');
+  
+  // Add commas as thousands separator
+  if (numericValue) {
+    value = parseInt(numericValue).toLocaleString('es-PE');
+  }
+  
+  input.value = value;
+}
+
+function parseCurrencyInput(value) {
+  // Remove commas and convert to number
+  if (!value) return 0;
+  return parseFloat(value.replace(/,/g, '')) || 0;
+}
+
 function formatDate(value) {
   const date = new Date(value);
   return new Intl.DateTimeFormat("es-PE", {
     day: "2-digit",
-    month: "short"
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   }).format(date);
 }
 

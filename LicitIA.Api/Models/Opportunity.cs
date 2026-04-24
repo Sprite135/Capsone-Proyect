@@ -25,4 +25,6 @@ public sealed class Opportunity
     public string Location { get; init; } = string.Empty;
 
     public bool IsPriority { get; init; }
+
+    public DateTime? PublishedDate { get; init; }
 }

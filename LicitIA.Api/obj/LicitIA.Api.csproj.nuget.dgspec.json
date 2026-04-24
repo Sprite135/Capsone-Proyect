@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {}
+    "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {}
   },
   "projects": {
-    "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {
+    "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
+        "projectUniqueName": "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
         "projectName": "LicitIA.Api",
-        "projectPath": "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
+        "projectPath": "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\LicitIA.Api.csproj",
         "packagesPath": "C:\\Users\\sprit\\.nuget\\packages\\",
-        "outputPath": "d:\\Proyecto_Respalto_caps\\LicitIA.Api\\obj\\",
+        "outputPath": "D:\\Proyecto_Respalto_caps\\LicitIA.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "d:\\Proyecto_Respalto_caps\\NuGet.Config",
+          "D:\\Proyecto_Respalto_caps\\NuGet.Config",
           "C:\\Users\\sprit\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
@@ -25,6 +25,9 @@
         "originalTargetFrameworks": [
           "net8.0"
         ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
@@ -46,6 +49,18 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "CsvHelper": {
+              "target": "Package",
+              "version": "[30.0.1, )"
+            },
+            "HtmlAgilityPack": {
+              "target": "Package",
+              "version": "[1.11.61, )"
+            },
+            "Microsoft.Playwright": {
+              "target": "Package",
+              "version": "[1.42.0, )"
+            },
             "System.Data.SqlClient": {
               "target": "Package",
               "version": "[4.8.6, )"
