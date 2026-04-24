@@ -208,6 +208,20 @@ public sealed class OpportunityRepository
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
+    public async Task UpdateMatchScoreAsync(int opportunityId, int matchScore, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = "UPDATE dbo.Opportunities SET MatchScore = @MatchScore WHERE OpportunityId = @OpportunityId;";
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@MatchScore", matchScore);
+        command.Parameters.AddWithValue("@OpportunityId", opportunityId);
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private static Opportunity MapOpportunity(SqlDataReader reader) =>
         new()
         {

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LicitIA | Configuración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand-block" href="index.html">
+        <div class="brand-mark">LI</div>
+        <div>
+          <p class="eyebrow">Emdersoft S.A.C.</p>
+          <h1>LicitIA</h1>
+        </div>
+      </a>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="index.html">Dashboard</a>
+        <a class="nav-item" href="oportunidades.html">Oportunidades</a>
+        <a class="nav-item" href="seguimiento.html">Seguimiento</a>
+        <a class="nav-item" href="alertas.html">Alertas</a>
+        <a class="nav-item active" href="configuracion.html">Configuración</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <p class="eyebrow">Perfil de empresa</p>
+        <h2>Configura tus preferencias</h2>
+        <p>Personaliza los criterios de afinidad para encontrar las mejores oportunidades.</p>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="topbar-copy">
+          <p class="eyebrow">Configuración</p>
+          <h2>Perfil de empresa y preferencias de afinidad</h2>
+        </div>
+        <div class="topbar-actions">
+          <button class="secondary-button" type="button" id="recalculateAffinity">Recalcular afinidad</button>
+          <div class="account-actions">
+            <a class="secondary-button logout-button" href="home.html">Cerrar sesion</a>
+            <div class="user-chip">ES</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="config-layout">
+        <div class="panel-card">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">Palabras Clave</p>
+              <h3>Configura tus preferencias</h3>
+            </div>
+          </div>
+
+          <div class="multi-select-form">
+            <div class="form-group tag-editor">
+              <label>Keywords preferidos</label>
+              <p class="field-description">
+                Ingresa palabras o frases relacionadas con tus productos o servicios. Verás en tus resultados de búsqueda negocios que contengan estas palabras, exactas o similares.
+              </p>
+              <p class="field-tip"> Te recomendamos usar palabras compuestas. Ej: "soporte técnico", "transformación digital", "mantenimiento preventivo".</p>
+              <div class="tag-editor-row">
+                <div class="tag-input-section">
+                  <input type="text" id="preferredKeywordInput" placeholder="Ej: soporte técnico, cloud, software...">
+                  <button type="button" id="addPreferredKeyword" class="secondary-button">+ Agregar</button>
+                  <small class="help-text">Keywords que suman puntos al aparecer en la licitación</small>
+                </div>
+                <div class="tag-display-section">
+                  <div class="tag-display-label">Preferidos:</div>
+                  <div id="preferredKeywordsList" class="tag-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group tag-editor" style="margin-top: 20px;">
+              <label>Keywords excluidos</label>
+              <p class="field-description">
+                Especifica palabras relacionadas con rubros que NO manejas o no te interesan. Estas oportunidades serán penalizadas.
+              </p>
+              <p class="field-tip"> Ej: "obra civil", "construcción", "demolición". Usa esto para evitar licitaciones fuera de tu especialidad.</p>
+              <div class="tag-editor-row">
+                <div class="tag-input-section">
+                  <input type="text" id="excludedKeywordInput" placeholder="Ej: obra civil, construcción...">
+                  <button type="button" id="addExcludedKeyword" class="secondary-button">+ Agregar</button>
+                  <small class="help-text">Keywords que restan puntos (rubros que NO haces)</small>
+                </div>
+                <div class="tag-display-section">
+                  <div class="tag-display-label">Excluidos:</div>
+                  <div id="excludedKeywordsList" class="tag-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">Acciones</p>
+              <h3>Guardar cambios</h3>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="saveProfile" class="primary-button">Guardar perfil</button>
+            <button type="button" id="resetProfile" class="secondary-button">Restaurar valores</button>
+          </div>
+        </div>
+      </section>
+
+      <p id="message" class="message" aria-live="polite"></p>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+</body>
+</html>

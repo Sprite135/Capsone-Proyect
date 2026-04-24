@@ -26,6 +26,7 @@ let allOpportunities = [];
 let currentPage = 1;
 const itemsPerPage = 15;
 let lastFilteredCount = 0;
+let profileKeywords = { preferred: [], excluded: [] };
 
 const setMessage = (text) => {
   if (message) {
@@ -225,11 +226,44 @@ if (detailHeading) {
   loadOpportunityDetail();
 }
 
+async function loadProfile() {
+  try {
+    const response = await fetch(`${API_BASE}/api/profile`);
+    if (response.ok) {
+      const profile = await response.json();
+      profileKeywords.preferred = profile.preferredKeywords || [];
+      profileKeywords.excluded = profile.excludedKeywords || [];
+      console.log('Profile loaded:', profileKeywords);
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+  }
+}
+
+function highlightKeywords(text, keywords) {
+  if (!text || !keywords || keywords.length === 0) return escapeHtml(text);
+  
+  let result = escapeHtml(text);
+  keywords.forEach(keyword => {
+    if (!keyword) return;
+    const regex = new RegExp(`(${escapeRegex(keyword)})`, 'gi');
+    result = result.replace(regex, '<span class="keyword-highlight">$1</span>');
+  });
+  return result;
+}
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 async function loadOpportunities() {
   try {
     if (opportunityMeta) {
       opportunityMeta.textContent = "Consultando oportunidades en la API...";
     }
+
+    // Cargar perfil con keywords
+    await loadProfile();
 
     const response = await fetch(`${API_BASE}/api/opportunities`);
     const data = await response.json().catch(() => []);
@@ -472,10 +506,21 @@ function renderOpportunities() {
     const matchesFavorite =
       favoriteFilter === "all" || (favoriteFilter === "only" && isOpportunityFavorite(item.opportunityId));
     const matchesAmount = item.estimatedAmount >= minAmount && item.estimatedAmount <= maxAmount;
-    const haystack = `${item.processCode} ${item.title} ${item.entityName} ${item.category} ${item.modality}`.toLowerCase();
+    const haystack = `${item.processCode} ${item.title} ${item.entityName} ${item.category} ${item.modality} ${item.summary || ''}`.toLowerCase();
     const matchesSearch = !searchTerm || haystack.includes(searchTerm);
 
-    return matchesCategory && matchesLocation && matchesFavorite && matchesAmount && matchesSearch;
+    // Filtrar por keywords del perfil
+    const matchesPreferredKeywords = profileKeywords.preferred.length === 0 || 
+      profileKeywords.preferred.some(keyword => haystack.includes(keyword.toLowerCase()));
+    const matchesExcludedKeywords = profileKeywords.excluded.length === 0 || 
+      !profileKeywords.excluded.some(keyword => haystack.includes(keyword.toLowerCase()));
+
+    // Debug: log primer item que no pasa el filtro de keywords
+    if (!matchesPreferredKeywords && profileKeywords.preferred.length > 0) {
+      console.log('Filtered out (no preferred match):', item.title, 'Keywords:', profileKeywords.preferred, 'Haystack:', haystack);
+    }
+
+    return matchesCategory && matchesLocation && matchesFavorite && matchesAmount && matchesSearch && matchesPreferredKeywords && matchesExcludedKeywords;
   });
 
   // Update category counters
@@ -740,7 +785,7 @@ function createOpportunityMarkup(item) {
         <div><span>Modalidad</span><strong>${escapeHtml(item.modality)}</strong></div>
       </div>
       <div class="result-foot">
-        <p class="help-copy">${escapeHtml(item.summary)}</p>
+        <p class="help-copy">${highlightKeywords(item.summary, profileKeywords.preferred)}</p>
         <div class="inline-actions">
           ${urgencyChip}
           <select class="tracking-status-select ${trackingStatusClass}" data-opportunity-id="${item.opportunityId}" aria-label="Estado de seguimiento">

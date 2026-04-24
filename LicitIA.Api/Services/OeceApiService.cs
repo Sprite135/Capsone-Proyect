@@ -213,18 +213,6 @@ public class OeceApiService
         }
     }
 
-    public class ScrapedOpportunity
-    {
-        public string ProcessCode { get; set; } = "";
-        public string Title { get; set; } = "";
-        public string EntityName { get; set; } = "";
-        public decimal EstimatedAmount { get; set; }
-        public DateTime? ClosingDate { get; set; }
-        public string Category { get; set; } = "";
-        public string Modality { get; set; } = "";
-        public string Description { get; set; } = "";
-        public DateTime? PublishedDate { get; set; }
-    }
 
     private string NormalizeCategory(string category)
     {

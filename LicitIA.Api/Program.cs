@@ -39,9 +39,11 @@ builder.Services.AddSingleton<PasswordService>();
 builder.Services.AddSingleton<SqlConnectionFactory>();
 builder.Services.AddSingleton<AuthRepository>();
 builder.Services.AddSingleton<OpportunityRepository>();
+builder.Services.AddSingleton<CompanyProfileRepository>();
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<SeaceScraperService>();
 builder.Services.AddSingleton<CsvImportService>();
+builder.Services.AddSingleton<AffinityService>();
 builder.Services.AddHttpClient<OeceDataService>();
 builder.Services.AddHttpClient<OeceApiService>();
 
@@ -659,6 +661,7 @@ app.MapPost("/api/seace/download", async (
 // SEACE refresh endpoint - clear DB and download from SEACE
 app.MapPost("/api/seace/refresh", async (
     SeaceScraperService seaceScraperService,
+    AffinityService affinityService,
     OpportunityRepository repository,
     CancellationToken cancellationToken,
     [FromQuery] int maxResults = 30) =>
@@ -679,50 +682,118 @@ app.MapPost("/api/seace/refresh", async (
             return Results.Ok(new { message = "No se encontraron oportunidades en SEACE.", count = 0 });
         }
 
-        // Guardar las oportunidades
+        // Calcular afinidad antes de guardar
+        var rankedOpportunities = await affinityService.RankOpportunitiesAsync(seaceOpportunities, cancellationToken);
+
+        // Guardar las oportunidades con scores de afinidad
         int savedCount = 0;
         int skippedCount = 0;
-        foreach (var seace in seaceOpportunities)
+        foreach (var scraped in rankedOpportunities)
         {
-            // Verificar si ya existe por código de proceso
-            var existing = await repository.GetByProcessCodeAsync(seace.ProcessCode, cancellationToken);
-            if (existing != null)
+            try
             {
-                Console.WriteLine($"[SeaceScraper] Duplicado omitido: {seace.ProcessCode}");
-                skippedCount++;
-                continue;
+                var opportunity = new Opportunity
+                {
+                    ProcessCode = scraped.ProcessCode,
+                    Title = scraped.Title,
+                    EntityName = scraped.EntityName,
+                    EstimatedAmount = scraped.EstimatedAmount,
+                    ClosingDate = scraped.ClosingDate,
+                    Category = scraped.Category,
+                    Modality = scraped.Modality,
+                    MatchScore = scraped.MatchScore,
+                    Summary = scraped.Description,
+                    Location = scraped.Location,
+                    IsPriority = scraped.MatchScore >= 85,
+                    PublishedDate = scraped.PublishedDate
+                };
+                await repository.InsertOpportunityAsync(opportunity, cancellationToken);
+                savedCount++;
+                Console.WriteLine($"[SeaceScraper] Guardada: {opportunity.ProcessCode} (Score: {opportunity.MatchScore}%)");
             }
-
-            var opportunity = new Opportunity
+            catch (Exception ex)
             {
-                ProcessCode = seace.ProcessCode,
-                Title = seace.Title,
-                EntityName = seace.EntityName,
-                EstimatedAmount = seace.EstimatedAmount,
-                ClosingDate = seace.ClosingDate,
-                Category = seace.Category,
-                Modality = seace.Modality,
-                MatchScore = 50,
-                Summary = seace.Description,
-                Location = "Lima",
-                IsPriority = false,
-                PublishedDate = seace.PublishedDate
-            };
-
-            await repository.InsertOpportunityAsync(opportunity, cancellationToken);
-            savedCount++;
-            Console.WriteLine($"[SeaceScraper] Guardada: {seace.ProcessCode}");
+                Console.WriteLine($"[SeaceScraper] Error guardando oportunidad {scraped.ProcessCode}: {ex.Message}");
+                skippedCount++;
+            }
         }
 
         Console.WriteLine($"[SeaceScraper] Refresh completado. Se guardaron {savedCount} oportunidades. Duplicados omitidos: {skippedCount}.");
 
-        return Results.Ok(new { message = $"Refresh completado. Se guardaron {savedCount} oportunidades de SEACE.", count = savedCount, skipped = skippedCount });
+        return Results.Ok(new { message = $"Refresh completado. Se guardaron {savedCount} oportunidades de SEACE con analisis de afinidad.", count = savedCount, skipped = skippedCount });
     }
     catch (Exception ex)
     {
         Console.WriteLine($"[SeaceScraper] Error en refresh: {ex.Message}");
         return Results.Problem(
             title: "No se pudo completar el refresh.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// Company Profile endpoints
+app.MapGet("/api/profile", async (
+    CompanyProfileRepository repository,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        Console.WriteLine("[Profile] Loading profile...");
+        var profile = await repository.GetDefaultProfileAsync(cancellationToken);
+        if (profile == null)
+        {
+            Console.WriteLine("[Profile] No profile found");
+            return Results.NotFound(new { message = "No se encontró perfil de empresa." });
+        }
+        Console.WriteLine($"[Profile] Profile loaded: {profile.CompanyName}, Keywords: {profile.PreferredKeywords.Count}");
+        return Results.Ok(profile);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Profile] Error: {ex.Message}\n{ex.StackTrace}");
+        return Results.Problem(
+            title: "Error al obtener perfil",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapPost("/api/profile", async (
+    CompanyProfileRepository repository,
+    LicitIA.Api.Models.CompanyProfile requestProfile,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var profileId = await repository.InsertProfileAsync(requestProfile, cancellationToken);
+        return Results.Created($"/api/profile/{profileId}", requestProfile);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "Error al crear perfil",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapPut("/api/profile/{id}", async (
+    int id,
+    CompanyProfileRepository repository,
+    LicitIA.Api.Models.CompanyProfile requestProfile,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var updatedProfile = requestProfile with { ProfileId = id };
+        await repository.UpdateProfileAsync(updatedProfile, cancellationToken);
+        return Results.Ok(updatedProfile);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "Error al actualizar perfil",
             detail: ex.Message,
             statusCode: StatusCodes.Status500InternalServerError);
     }

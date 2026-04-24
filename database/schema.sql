@@ -75,6 +75,31 @@ BEGIN
     PRINT 'Tabla LoginAttempts ya existe.';
 END
 
+-- Crear tabla CompanyProfile
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'CompanyProfile')
+BEGIN
+    CREATE TABLE dbo.CompanyProfile (
+        ProfileId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        UserId UNIQUEIDENTIFIER NULL,
+        CompanyName NVARCHAR(200) NOT NULL,
+        PreferredCategories NVARCHAR(MAX) NULL, -- JSON array
+        PreferredLocations NVARCHAR(MAX) NULL, -- JSON array
+        MinAmount DECIMAL(18,2) NOT NULL DEFAULT 0,
+        MaxAmount DECIMAL(18,2) NOT NULL DEFAULT 999999999,
+        FavoriteEntities NVARCHAR(MAX) NULL, -- JSON array
+        CreatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        UpdatedAtUtc DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        FOREIGN KEY (UserId) REFERENCES dbo.AppUsers(UserId)
+    );
+    
+    CREATE INDEX IX_CompanyProfile_UserId ON dbo.CompanyProfile(UserId);
+    PRINT 'Tabla CompanyProfile creada exitosamente.';
+END
+ELSE
+BEGIN
+    PRINT 'Tabla CompanyProfile ya existe.';
+END
+
 -- Insertar datos de ejemplo en Opportunities
 IF NOT EXISTS (SELECT * FROM dbo.Opportunities)
 BEGIN

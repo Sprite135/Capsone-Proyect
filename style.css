@@ -967,6 +967,408 @@ td,
   border-color: var(--primary);
 }
 
+/* Configuration Form Styles */
+.config-layout {
+  display: grid;
+  gap: 24px;
+  width: 100%;
+}
+
+.config-form {
+  display: grid;
+  gap: 20px;
+}
+
+.form-group {
+  display: grid;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.form-group input[type="text"]:hover,
+.form-group input[type="number"]:hover {
+  border-color: var(--blue);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.help-text {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.keyword-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  min-height: 40px;
+  padding: 8px;
+  background: var(--panel-soft);
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.keyword-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.keyword-tag button {
+  background: none;
+  border: none;
+  color: var(--blue);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.keyword-tag button:hover {
+  background: var(--blue);
+  color: white;
+}
+
+.keyword-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.keyword-input-group input[type="text"] {
+  flex: 1;
+}
+
+.keyword-input-group select {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 14px;
+  min-width: 120px;
+}
+
+.keyword-input-group button {
+  padding: 10px 20px;
+}
+
+.keyword-highlight {
+  background: linear-gradient(120deg, var(--yellow-soft) 0%, var(--yellow) 100%);
+  color: var(--text-dark);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* Tag Editor - Layout dos columnas tipo LicitaLAB */
+.tag-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.tag-editor-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .tag-editor-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tag-input-section {
+  display: grid;
+  gap: 8px;
+}
+
+.tag-input-section input[type="text"] {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.tag-input-section button {
+  padding: 10px 16px;
+  font-size: 13px;
+  justify-self: start;
+}
+
+.field-description {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.field-tip {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+  background: rgba(242, 193, 78, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 3px solid var(--gold);
+}
+
+.tag-display-section {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 80px;
+}
+
+.tag-display-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+/* Tag List - Editable tags */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tag-input-group input[type="text"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.tag-input-group button {
+  padding: 10px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.multi-select-form {
+  display: grid;
+  gap: 20px;
+}
+
+/* Tags - Estilo LicitaLAB */
+.tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.tag:hover {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.tag.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+
+.tag.active::after {
+  content: '✓';
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.tag.tag-excluded {
+  border-color: var(--line);
+}
+
+.tag.tag-excluded:hover {
+  border-color: var(--red);
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.tag.tag-excluded.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+}
+
+.checkbox-label:hover {
+  background: var(--panel-strong);
+  border-color: var(--blue);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel-soft);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.checkbox-label input[type="checkbox"]:hover {
+  border-color: var(--blue);
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"]:checked + span {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.checkbox-label span {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-actions button {
+  min-width: 160px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.form-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.form-actions button:active {
+  transform: translateY(0);
+}
+
 .result-meta,
 .detail-meta,
 .info-list {

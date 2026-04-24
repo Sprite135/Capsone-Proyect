@@ -14,7 +14,7 @@ public sealed class OpportunityResponse
 
     public decimal EstimatedAmount { get; init; }
 
-    public DateTime ClosingDate { get; init; }
+    public DateTime? ClosingDate { get; init; }
 
     public string Category { get; init; } = string.Empty;
 
