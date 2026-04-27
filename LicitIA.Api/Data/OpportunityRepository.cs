@@ -28,6 +28,7 @@ public sealed class OpportunityRepository
                 Category,
                 Modality,
                 MatchScore,
+                MatchedKeywordsCount,
                 Summary,
                 Location,
                 IsPriority,
@@ -65,6 +66,7 @@ public sealed class OpportunityRepository
                 Category,
                 Modality,
                 MatchScore,
+                MatchedKeywordsCount,
                 Summary,
                 Location,
                 IsPriority,
@@ -102,6 +104,7 @@ public sealed class OpportunityRepository
                 Category,
                 Modality,
                 MatchScore,
+                MatchedKeywordsCount,
                 Summary,
                 Location,
                 IsPriority,
@@ -161,6 +164,7 @@ public sealed class OpportunityRepository
                 Category,
                 Modality,
                 MatchScore,
+                MatchedKeywordsCount,
                 Summary,
                 Location,
                 IsPriority,
@@ -177,6 +181,7 @@ public sealed class OpportunityRepository
                 @Category,
                 @Modality,
                 @MatchScore,
+                @MatchedKeywordsCount,
                 @Summary,
                 @Location,
                 @IsPriority,
@@ -194,6 +199,7 @@ public sealed class OpportunityRepository
         command.Parameters.AddWithValue("@Category", opportunity.Category);
         command.Parameters.AddWithValue("@Modality", opportunity.Modality);
         command.Parameters.AddWithValue("@MatchScore", opportunity.MatchScore);
+        command.Parameters.AddWithValue("@MatchedKeywordsCount", opportunity.MatchedKeywordsCount);
         command.Parameters.AddWithValue("@Summary", opportunity.Summary);
         command.Parameters.AddWithValue("@Location", opportunity.Location);
         command.Parameters.AddWithValue("@IsPriority", opportunity.IsPriority);
@@ -228,6 +234,21 @@ public sealed class OpportunityRepository
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
+    public async Task UpdateMatchScoreAndCountAsync(int opportunityId, int matchScore, int matchedKeywordsCount, CancellationToken cancellationToken)
+    {
+        await using var connection = _connectionFactory.CreateConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        const string sql = "UPDATE dbo.Opportunities SET MatchScore = @MatchScore, MatchedKeywordsCount = @MatchedKeywordsCount WHERE OpportunityId = @OpportunityId;";
+
+        await using var command = new SqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@MatchScore", matchScore);
+        command.Parameters.AddWithValue("@MatchedKeywordsCount", matchedKeywordsCount);
+        command.Parameters.AddWithValue("@OpportunityId", opportunityId);
+
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private static Opportunity MapOpportunity(SqlDataReader reader) =>
         new()
         {
@@ -240,6 +261,7 @@ public sealed class OpportunityRepository
             Category = reader.GetString(reader.GetOrdinal("Category")),
             Modality = reader.GetString(reader.GetOrdinal("Modality")),
             MatchScore = reader.GetInt32(reader.GetOrdinal("MatchScore")),
+            MatchedKeywordsCount = reader.GetInt32(reader.GetOrdinal("MatchedKeywordsCount")),
             Summary = reader.GetString(reader.GetOrdinal("Summary")),
             Location = reader.GetString(reader.GetOrdinal("Location")),
             IsPriority = reader.GetBoolean(reader.GetOrdinal("IsPriority")),

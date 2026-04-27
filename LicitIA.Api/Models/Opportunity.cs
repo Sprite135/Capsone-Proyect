@@ -20,6 +20,8 @@ public sealed class Opportunity
 
     public int MatchScore { get; set; }
 
+    public int MatchedKeywordsCount { get; set; }
+
     public string Summary { get; init; } = string.Empty;
 
     public string Location { get; init; } = string.Empty;

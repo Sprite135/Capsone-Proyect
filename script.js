@@ -146,6 +146,42 @@ if (saveFiltersBtn) {
   });
 }
 
+// Event listener for Recalcular afinidad button
+const recalculateAffinityBtn = document.getElementById('recalculateAffinity');
+console.log('Recalculate button found:', recalculateAffinityBtn);
+if (recalculateAffinityBtn) {
+  recalculateAffinityBtn.addEventListener('click', async () => {
+    console.log('Recalculate button clicked');
+    try {
+      recalculateAffinityBtn.disabled = true;
+      recalculateAffinityBtn.textContent = 'Recalculando...';
+      setMessage('Recalculando afinidad...');
+
+      console.log('Fetching recalculate-affinity endpoint');
+      const response = await fetch(`${API_BASE}/opportunities/recalculate-affinity`, {
+        method: 'POST'
+      });
+      console.log('Response status:', response.status);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Recalculate result:', result);
+        setMessage(`Afinidad recalculada: ${result.updatedCount} de ${result.totalOpportunities} oportunidades actualizadas`);
+        await loadOpportunities();
+      } else {
+        console.error('Response not ok:', response.status);
+        setMessage('Error al recalcular afinidad');
+      }
+    } catch (error) {
+      console.error('Error recalculating affinity:', error);
+      setMessage('Error de conexión al recalcular afinidad');
+    } finally {
+      recalculateAffinityBtn.disabled = false;
+      recalculateAffinityBtn.textContent = 'Recalcular afinidad';
+    }
+  });
+}
+
 // Load saved filters on page load
 window.addEventListener('DOMContentLoaded', () => {
   const savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '{}');

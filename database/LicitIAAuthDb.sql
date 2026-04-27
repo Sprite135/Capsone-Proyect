@@ -50,11 +50,18 @@ BEGIN
         Category NVARCHAR(100) NOT NULL,
         Modality NVARCHAR(100) NOT NULL,
         MatchScore INT NOT NULL,
+        MatchedKeywordsCount INT NOT NULL CONSTRAINT DF_Opportunities_MatchedKeywordsCount DEFAULT (0),
         Summary NVARCHAR(700) NOT NULL,
         Location NVARCHAR(120) NOT NULL,
         IsPriority BIT NOT NULL CONSTRAINT DF_Opportunities_IsPriority DEFAULT (0),
         CreatedAtUtc DATETIME2(0) NOT NULL CONSTRAINT DF_Opportunities_CreatedAtUtc DEFAULT (SYSUTCDATETIME())
     );
+END;
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('dbo.Opportunities') AND name = 'MatchedKeywordsCount')
+BEGIN
+    ALTER TABLE dbo.Opportunities ADD MatchedKeywordsCount INT NOT NULL CONSTRAINT DF_Opportunities_MatchedKeywordsCount DEFAULT (0);
 END;
 GO
 

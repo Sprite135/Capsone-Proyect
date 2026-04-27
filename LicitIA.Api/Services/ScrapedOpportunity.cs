@@ -13,4 +13,5 @@ public class ScrapedOpportunity
     public DateTime? PublishedDate { get; set; }
     public string Location { get; set; } = string.Empty;
     public int MatchScore { get; set; }
+    public int MatchedKeywordsCount { get; set; }
 }

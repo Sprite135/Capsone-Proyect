@@ -330,7 +330,7 @@ h4,
 }
 
 .search-box {
-  min-width: 240px;
+  min-width: 400px;
   padding: 14px 18px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -864,6 +864,31 @@ td,
   gap: 12px;
   align-items: start;
   margin-bottom: 18px;
+}
+
+.card-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
 }
 
 .card-header h3,

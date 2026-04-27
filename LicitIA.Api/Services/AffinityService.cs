@@ -50,15 +50,18 @@ namespace LicitIA.Api.Services
             int score = 0;
 
             // Keywords en título y descripción (100 puntos) - LicitaLAB style
-            score += CalculateKeywordScore(opportunity, profile);
+            var (keywordScore, matchedCount) = CalculateKeywordScore(opportunity, profile);
+            score += keywordScore;
+            opportunity.MatchedKeywordsCount = matchedCount;
 
             // Asegurar que el score esté entre 0 y 100
             return Math.Max(0, Math.Min(score, 100));
         }
 
-        private int CalculateKeywordScore(ScrapedOpportunity opportunity, Models.CompanyProfile profile)
+        private (int score, int matchedCount) CalculateKeywordScore(ScrapedOpportunity opportunity, Models.CompanyProfile profile)
         {
             int score = 0;
+            int matchedCount = 0;
             string text = $"{opportunity.Title} {opportunity.Description}".ToLower();
 
             // Keywords preferidos (suman puntos)
@@ -68,6 +71,7 @@ namespace LicitIA.Api.Services
                 if (count > 0)
                 {
                     score += Math.Min(count, 3) * 10; // 10 puntos por ocurrencia, max 30
+                    matchedCount++;
                 }
             }
 
@@ -81,7 +85,7 @@ namespace LicitIA.Api.Services
                 }
             }
 
-            return Math.Max(0, Math.Min(score, 100));
+            return (Math.Max(0, Math.Min(score, 100)), matchedCount);
         }
 
         private int CountOccurrences(string text, string keyword)
@@ -122,13 +126,18 @@ namespace LicitIA.Api.Services
         public async Task<List<ScrapedOpportunity>> RankOpportunitiesAsync(List<ScrapedOpportunity> opportunities, CancellationToken cancellationToken)
         {
             var profile = await GetProfileAsync(cancellationToken);
-            
+
             foreach (var opportunity in opportunities)
             {
                 opportunity.MatchScore = CalculateAffinityScore(opportunity, profile);
             }
 
             return opportunities.OrderByDescending(o => o.MatchScore).ToList();
+        }
+
+        public void InvalidateCache()
+        {
+            _cachedProfile = null;
         }
     }
 }

@@ -2,17 +2,20 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Data.SqlClient;
 using System.Text;
+using System.Text.Json;
 using LicitIA.Api.Configuration;
 using LicitIA.Api.Contracts;
 using LicitIA.Api.Data;
 using LicitIA.Api.Models;
 using LicitIA.Api.Security;
 using LicitIA.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using ScrapedOpportunity = LicitIA.Api.Services.ScrapedOpportunity;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -855,6 +858,7 @@ app.MapPost("/api/profile", async (
 app.MapPut("/api/profile/{id}", async (
     int id,
     CompanyProfileRepository repository,
+    AffinityService affinityService,
     LicitIA.Api.Models.CompanyProfile requestProfile,
     CancellationToken cancellationToken) =>
 {
@@ -862,6 +866,7 @@ app.MapPut("/api/profile/{id}", async (
     {
         var updatedProfile = requestProfile with { ProfileId = id };
         await repository.UpdateProfileAsync(updatedProfile, cancellationToken);
+        affinityService.InvalidateCache();
         return Results.Ok(updatedProfile);
     }
     catch (Exception ex)
@@ -908,6 +913,60 @@ app.MapPost("/api/opportunities/import-csv", async (
         Console.WriteLine($"[CsvImport] Error: {ex.Message}");
         return Results.Problem(
             title: "Error al importar CSV",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+// Recalculate affinity scores endpoint
+app.MapPost("/api/opportunities/recalculate-affinity", async (
+    OpportunityRepository repository,
+    AffinityService affinityService,
+    CancellationToken cancellationToken) =>
+{
+    try
+    {
+        Console.WriteLine("[RecalculateAffinity] Iniciando recálculo de afinidad...");
+
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        Console.WriteLine($"[RecalculateAffinity] {opportunities.Count} oportunidades encontradas");
+
+        int updatedCount = 0;
+        foreach (var opportunity in opportunities)
+        {
+            var scrapedOpportunity = new ScrapedOpportunity
+            {
+                ProcessCode = opportunity.ProcessCode,
+                Title = opportunity.Title,
+                Description = opportunity.Summary ?? ""
+            };
+
+            var newScore = await affinityService.CalculateAffinityScoreAsync(scrapedOpportunity, cancellationToken);
+            var newMatchedCount = scrapedOpportunity.MatchedKeywordsCount;
+
+            if (opportunity.MatchScore != newScore || opportunity.MatchedKeywordsCount != newMatchedCount)
+            {
+                await repository.UpdateMatchScoreAndCountAsync(opportunity.OpportunityId, newScore, newMatchedCount, cancellationToken);
+                updatedCount++;
+            }
+        }
+
+        affinityService.InvalidateCache();
+
+        Console.WriteLine($"[RecalculateAffinity] Recálculo completado. {updatedCount} oportunidades actualizadas");
+
+        return Results.Ok(new
+        {
+            message = $"Recálculo completado. {updatedCount} de {opportunities.Count} oportunidades actualizadas.",
+            totalOpportunities = opportunities.Count,
+            updatedCount
+        });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[RecalculateAffinity] Error: {ex.Message}");
+        return Results.Problem(
+            title: "Error al recalcular afinidad",
             detail: ex.Message,
             statusCode: StatusCodes.Status500InternalServerError);
     }

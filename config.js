@@ -182,14 +182,14 @@ function resetForm() {
 async function recalculateAffinity() {
   try {
     showMessage('Recalculando afinidad...', 'info');
-    
-    const response = await fetch(`${API_BASE}/opportunities/analyze`, {
+
+    const response = await fetch(`${API_BASE}/opportunities/recalculate-affinity`, {
       method: 'POST'
     });
 
     if (response.ok) {
       const result = await response.json();
-      showMessage(`Afinidad recalculada: ${result.updatedCount} oportunidades actualizadas`, 'success');
+      showMessage(`Afinidad recalculada: ${result.updatedCount} de ${result.totalOpportunities} oportunidades actualizadas`, 'success');
     } else {
       showMessage('Error al recalcular afinidad', 'error');
     }
