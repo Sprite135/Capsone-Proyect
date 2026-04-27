@@ -81,6 +81,11 @@ chips.forEach((chip) => {
     chip.classList.add("active");
     setMessage(`Filtro aplicado: ${chip.textContent}.`);
     renderOpportunities();
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+      const topbarPosition = topbar.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: topbarPosition - 20, behavior: 'smooth' });
+    }
   });
 });
 
@@ -90,6 +95,11 @@ if (applyAmountFilterBtn) {
   applyAmountFilterBtn.addEventListener('click', () => {
     renderOpportunities();
     setMessage('Filtro de monto aplicado.');
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+      const topbarPosition = topbar.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: topbarPosition - 20, behavior: 'smooth' });
+    }
   });
 }
 
@@ -98,13 +108,78 @@ const clearAmountFilterBtn = document.getElementById('clearAmountFilter');
 if (clearAmountFilterBtn) {
   clearAmountFilterBtn.addEventListener('click', () => {
     const minAmountInput = document.getElementById('minAmount');
-    const maxAmountInput = document.getElementById('maxAmount');
     if (minAmountInput) minAmountInput.value = '';
+    const maxAmountInput = document.getElementById('maxAmount');
     if (maxAmountInput) maxAmountInput.value = '';
     renderOpportunities();
     setMessage('Filtro de monto borrado.');
+    const topbar = document.querySelector('.topbar');
+    if (topbar) {
+      const topbarPosition = topbar.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({ top: topbarPosition - 20, behavior: 'smooth' });
+    }
   });
 }
+
+// Event listener for Guardar filtros button
+const saveFiltersBtn = document.getElementById('saveFiltersBtn');
+if (saveFiltersBtn) {
+  saveFiltersBtn.addEventListener('click', () => {
+    const activeCategory = document.querySelector('.filter-group[data-filter-group="category"] .chip.active');
+    const activeLocation = document.querySelector('.filter-group[data-filter-group="location"] .chip.active');
+    const activeFavorite = document.querySelector('.filter-group[data-filter-group="favorite"] .chip.active');
+    const minAmount = document.getElementById('minAmount')?.value;
+    const maxAmount = document.getElementById('maxAmount')?.value;
+    const searchTerm = document.getElementById('opportunitySearch')?.value;
+
+    const savedFilters = {
+      category: activeCategory?.dataset.filterValue || 'Todos',
+      location: activeLocation?.dataset.filterValue || 'Todos',
+      favorite: activeFavorite?.dataset.filterValue || 'all',
+      minAmount: minAmount || '',
+      maxAmount: maxAmount || '',
+      searchTerm: searchTerm || ''
+    };
+
+    localStorage.setItem('savedFilters', JSON.stringify(savedFilters));
+    setMessage('Filtros guardados exitosamente.');
+  });
+}
+
+// Load saved filters on page load
+window.addEventListener('DOMContentLoaded', () => {
+  const savedFilters = JSON.parse(localStorage.getItem('savedFilters') || '{}');
+  
+  if (savedFilters.category) {
+    const categoryChip = document.querySelector(`.filter-group[data-filter-group="category"] .chip[data-filter-value="${savedFilters.category}"]`);
+    if (categoryChip) categoryChip.click();
+  }
+  
+  if (savedFilters.location) {
+    const locationChip = document.querySelector(`.filter-group[data-filter-group="location"] .chip[data-filter-value="${savedFilters.location}"]`);
+    if (locationChip) locationChip.click();
+  }
+  
+  if (savedFilters.favorite) {
+    const favoriteChip = document.querySelector(`.filter-group[data-filter-group="favorite"] .chip[data-filter-value="${savedFilters.favorite}"]`);
+    if (favoriteChip) favoriteChip.click();
+  }
+  
+  if (savedFilters.minAmount) {
+    const minAmountInput = document.getElementById('minAmount');
+    if (minAmountInput) minAmountInput.value = savedFilters.minAmount;
+  }
+  
+  if (savedFilters.maxAmount) {
+    const maxAmountInput = document.getElementById('maxAmount');
+    if (maxAmountInput) maxAmountInput.value = savedFilters.maxAmount;
+  }
+  
+  if (savedFilters.searchTerm) {
+    const searchInput = document.getElementById('opportunitySearch');
+    if (searchInput) searchInput.value = savedFilters.searchTerm;
+  }
+});
 
 if (opportunitySearch) {
   opportunitySearch.addEventListener("input", () => {

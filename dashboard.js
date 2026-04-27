@@ -70,6 +70,12 @@ function renderCategoryChart(data) {
     
     const labels = data.map(d => d.category);
     const counts = data.map(d => d.count);
+    const amounts = data.map(d => d.totalAmount);
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
+    gradient.addColorStop(1, 'rgba(124, 58, 237, 0.6)');
     
     new Chart(ctx, {
         type: 'bar',
@@ -78,24 +84,49 @@ function renderCategoryChart(data) {
             datasets: [{
                 label: 'Oportunidades',
                 data: counts,
-                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                backgroundColor: gradient,
                 borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 1
+                borderWidth: 2,
+                borderRadius: 8,
+                hoverBackgroundColor: 'rgba(124, 58, 237, 0.8)'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10, 21, 38, 0.95)',
+                    titleColor: '#e7f0ff',
+                    bodyColor: '#92a4bf',
+                    borderColor: 'rgba(154, 181, 219, 0.2)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            const amount = amounts[context.dataIndex];
+                            return [
+                                `Cantidad: ${context.raw}`,
+                                `Monto: S/ ${formatNumber(amount)}`
+                            ];
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#92a4bf'
+                        color: '#92a4bf',
+                        font: { size: 11 }
                     },
                     grid: {
                         color: 'rgba(154, 181, 219, 0.12)'
@@ -103,7 +134,8 @@ function renderCategoryChart(data) {
                 },
                 x: {
                     ticks: {
-                        color: '#92a4bf'
+                        color: '#92a4bf',
+                        font: { size: 11 }
                     },
                     grid: {
                         display: false
@@ -119,6 +151,12 @@ function renderEntityChart(data) {
     
     const labels = data.map(d => d.entity);
     const counts = data.map(d => d.count);
+    const amounts = data.map(d => d.totalAmount);
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 400, 0);
+    gradient.addColorStop(0, 'rgba(28, 200, 183, 0.8)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.6)');
     
     new Chart(ctx, {
         type: 'bar',
@@ -127,25 +165,50 @@ function renderEntityChart(data) {
             datasets: [{
                 label: 'Oportunidades',
                 data: counts,
-                backgroundColor: 'rgba(28, 200, 183, 0.6)',
+                backgroundColor: gradient,
                 borderColor: 'rgba(28, 200, 183, 1)',
-                borderWidth: 1
+                borderWidth: 2,
+                borderRadius: 8,
+                hoverBackgroundColor: 'rgba(59, 130, 246, 0.8)'
             }]
         },
         options: {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10, 21, 38, 0.95)',
+                    titleColor: '#e7f0ff',
+                    bodyColor: '#92a4bf',
+                    borderColor: 'rgba(154, 181, 219, 0.2)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            const amount = amounts[context.dataIndex];
+                            return [
+                                `Cantidad: ${context.raw}`,
+                                `Monto: S/ ${formatNumber(amount)}`
+                            ];
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#92a4bf'
+                        color: '#92a4bf',
+                        font: { size: 11 }
                     },
                     grid: {
                         display: false
@@ -154,7 +217,8 @@ function renderEntityChart(data) {
                 x: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#92a4bf'
+                        color: '#92a4bf',
+                        font: { size: 11 }
                     },
                     grid: {
                         color: 'rgba(154, 181, 219, 0.12)'
@@ -172,6 +236,12 @@ function renderTrendsChart(data) {
     
     const labels = data.map(d => `${monthNames[d.month - 1]} ${d.year}`);
     const counts = data.map(d => d.count);
+    const amounts = data.map(d => d.totalAmount);
+    
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+    gradient.addColorStop(1, 'rgba(124, 58, 237, 0.05)');
     
     new Chart(ctx, {
         type: 'line',
@@ -181,25 +251,53 @@ function renderTrendsChart(data) {
                 label: 'Oportunidades',
                 data: counts,
                 borderColor: 'rgba(59, 130, 246, 1)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 2,
+                backgroundColor: gradient,
+                borderWidth: 3,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
             plugins: {
                 legend: {
                     display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(10, 21, 38, 0.95)',
+                    titleColor: '#e7f0ff',
+                    bodyColor: '#92a4bf',
+                    borderColor: 'rgba(154, 181, 219, 0.2)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            const amount = amounts[context.dataIndex];
+                            return [
+                                `Cantidad: ${context.raw}`,
+                                `Monto: S/ ${formatNumber(amount)}`
+                            ];
+                        }
+                    }
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#92a4bf'
+                        color: '#92a4bf',
+                        font: { size: 11 }
                     },
                     grid: {
                         color: 'rgba(154, 181, 219, 0.12)'
@@ -207,7 +305,8 @@ function renderTrendsChart(data) {
                 },
                 x: {
                     ticks: {
-                        color: '#92a4bf'
+                        color: '#92a4bf',
+                        font: { size: 11 }
                     },
                     grid: {
                         display: false
