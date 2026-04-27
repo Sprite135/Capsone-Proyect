@@ -583,7 +583,8 @@ input.search-box:focus {
   font-size: 0.9rem;
 }
 
-.filters-section .filter-group select {
+.filters-section .filter-group select,
+.topbar-actions .filter-group select {
   padding: 8px 12px;
   border-radius: 8px;
   background: var(--panel-soft);
@@ -591,13 +592,21 @@ input.search-box:focus {
   color: var(--text);
   cursor: pointer;
   font-size: 0.9rem;
+  min-width: 150px;
 }
 
-.filters-section .filter-group select:hover {
+select option {
+  background: var(--panel);
+  color: var(--text);
+}
+
+.filters-section .filter-group select:hover,
+.topbar-actions .filter-group select:hover {
   border-color: var(--accent);
 }
 
-.filters-section .filter-group select:focus {
+.filters-section .filter-group select:focus,
+.topbar-actions .filter-group select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-soft);

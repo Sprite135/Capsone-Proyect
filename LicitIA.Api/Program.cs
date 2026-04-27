@@ -421,6 +421,55 @@ app.MapGet("/api/metrics/trends", async (
     }
 });
 
+app.MapGet("/api/metrics/entity-analysis", async (
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int? days = null) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        // Filter by date if specified
+        if (days.HasValue)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days.Value);
+            opportunities = opportunities.Where(o => o.PublishedDate.HasValue && o.PublishedDate >= cutoffDate).ToList();
+        }
+        
+        var entityAnalysis = opportunities
+            .Where(o => !string.IsNullOrWhiteSpace(o.EntityName) && !string.IsNullOrWhiteSpace(o.Category))
+            .GroupBy(o => o.EntityName)
+            .Select(g => new
+            {
+                entity = g.Key,
+                totalOpportunities = g.Count(),
+                totalAmount = g.Sum(o => o.EstimatedAmount),
+                categories = g.GroupBy(o => o.Category)
+                    .Select(cg => new
+                    {
+                        category = cg.Key,
+                        count = cg.Count(),
+                        amount = cg.Sum(o => o.EstimatedAmount)
+                    })
+                    .OrderByDescending(cg => cg.count)
+                    .ToList()
+            })
+            .OrderByDescending(g => g.totalOpportunities)
+            .Take(20)
+            .ToList();
+        
+        return Results.Ok(entityAnalysis);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudo obtener el análisis de entidades.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
 app.MapPost("/api/auth/register", async (
     RegisterRequest request,
     AuthRepository repository,

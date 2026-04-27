@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LicitIA | Análisis de Entidades</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand-block" href="index.html">
+        <div class="brand-mark">LI</div>
+        <div>
+          <p class="eyebrow">Emdersoft S.A.C.</p>
+          <h1>LicitIA</h1>
+        </div>
+      </a>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="index.html">Dashboard</a>
+        <a class="nav-item" href="oportunidades.html">Oportunidades</a>
+        <a class="nav-item" href="seguimiento.html">Seguimiento</a>
+        <a class="nav-item" href="alertas.html">Alertas</a>
+        <a class="nav-item active" href="analisis-entidades.html">Análisis Entidades</a>
+        <a class="nav-item" href="configuracion.html">Configuración</a>
+      </nav>
+
+      <div class="sidebar-card">
+        <p class="eyebrow">Análisis</p>
+        <h2>Entidades</h2>
+        <p>Identifica qué entidades compran qué productos y patrones de compra.</p>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="topbar-copy">
+          <p class="eyebrow">Análisis de entidades</p>
+          <h2>Qué entidades compran qué productos</h2>
+        </div>
+        <div class="topbar-actions">
+          <div class="filter-group">
+            <label for="dateFilter">Periodo:</label>
+            <select id="dateFilter" onchange="loadEntityAnalysis()">
+              <option value="30">Últimos 30 días</option>
+              <option value="90">Últimos 90 días</option>
+              <option value="180">Últimos 6 meses</option>
+              <option value="365">Último año</option>
+              <option value="all" selected>Todo el historial</option>
+            </select>
+          </div>
+          <button class="secondary-button" onclick="exportAnalysis()">Exportar análisis</button>
+          <div class="account-actions">
+            <a class="secondary-button logout-button" href="home.html">Cerrar sesion</a>
+            <div class="user-chip">ES</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <p>Total entidades</p>
+          <strong id="total-entities">-</strong>
+          <span>Con oportunidades registradas</span>
+        </article>
+        <article class="stat-card">
+          <p>Monto total</p>
+          <strong id="total-amount">S/ -</strong>
+          <span>Valor estimado de todas las oportunidades</span>
+        </article>
+        <article class="stat-card">
+          <p>Entidad top</p>
+          <strong id="top-entity">-</strong>
+          <span>Con más oportunidades</span>
+        </article>
+        <article class="stat-card">
+          <p>Categoría top</p>
+          <strong id="top-category">-</strong>
+          <span>Más demandada</span>
+        </article>
+      </section>
+
+      <section class="charts-grid">
+        <div class="chart-card">
+          <div class="card-header">
+            <p class="eyebrow">Top entidades</p>
+            <h3>Entidades con más oportunidades</h3>
+          </div>
+          <canvas id="topEntitiesChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <p class="eyebrow">Distribución por categoría</p>
+            <h3>Oportunidades por rubro</h3>
+          </div>
+          <canvas id="categoryDistributionChart"></canvas>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="card-header">
+          <div>
+            <p class="eyebrow">Detalle por entidad</p>
+            <h3>Análisis completo de entidades</h3>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="entityTable">
+            <thead>
+              <tr>
+                <th>Entidad</th>
+                <th>Oportunidades</th>
+                <th>Monto Total</th>
+                <th>Categorías principales</th>
+              </tr>
+            </thead>
+            <tbody id="entityTableBody">
+              <tr>
+                <td colspan="4">Cargando datos...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p id="message" class="message" aria-live="polite"></p>
+    </main>
+  </div>
+
+  <script src="analisis-entidades.js"></script>
+</body>
+</html>
