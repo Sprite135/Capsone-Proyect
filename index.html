@@ -73,11 +73,11 @@
 
         <div class="hero-highlight">
           <p class="eyebrow">Hoy</p>
-          <strong>18 oportunidades</strong>
+          <strong id="hero-total">- oportunidades</strong>
           <ul class="summary-list">
-            <li>7 procesos con prioridad alta</li>
-            <li>3 cierres dentro de 48 horas</li>
-            <li>5 alertas nuevas para revision</li>
+            <li id="hero-priority">- procesos con prioridad alta</li>
+            <li id="hero-closing">- cierres dentro de 48 horas</li>
+            <li id="hero-alerts">- alertas nuevas para revision</li>
           </ul>
         </div>
       </section>
@@ -122,126 +122,28 @@
         </div>
       </section>
 
-      <section class="content-grid">
-        <div class="panel-card">
+      <section class="charts-grid">
+        <div class="chart-card">
           <div class="card-header">
-            <div>
-              <p class="eyebrow">Radar de oportunidades</p>
-              <h3>Procesos destacados por el motor inteligente</h3>
-            </div>
-            <a class="text-link" href="oportunidades.html">Ver modulo completo</a>
+            <p class="eyebrow">Tendencias mensuales</p>
+            <h3>Oportunidades por mes</h3>
           </div>
-
-          <div class="opportunity-list">
-            <article class="opportunity-card">
-              <div class="opportunity-top">
-                <div>
-                  <h4>Servicio de soporte y mantenimiento TI</h4>
-                  <p>Ministerio de Desarrollo e Inclusion Social</p>
-                </div>
-                <span class="score high">96%</span>
-              </div>
-              <div class="meta-row">
-                <span>Monto estimado: S/ 480,000</span>
-                <span>Cierre: 25 abril</span>
-                <span>Rubro: Software y soporte</span>
-              </div>
-              <div class="inline-actions">
-                <a class="text-link" href="detalle-licitacion.html">Ver detalle</a>
-                <button class="secondary-button small-button" type="button" data-demo-message="Proceso agregado al seguimiento del equipo comercial.">Agregar a seguimiento</button>
-              </div>
-            </article>
-
-            <article class="opportunity-card">
-              <div class="opportunity-top">
-                <div>
-                  <h4>Implementacion de plataforma documental</h4>
-                  <p>Gobierno Regional de Arequipa</p>
-                </div>
-                <span class="score medium">88%</span>
-              </div>
-              <div class="meta-row">
-                <span>Monto estimado: S/ 310,000</span>
-                <span>Cierre: 28 abril</span>
-                <span>Rubro: Transformacion digital</span>
-              </div>
-              <div class="inline-actions">
-                <a class="text-link" href="detalle-licitacion.html">Ver detalle</a>
-                <button class="secondary-button small-button" type="button" data-demo-message="Se guardo la oportunidad en la bandeja de revision.">Guardar</button>
-              </div>
-            </article>
-          </div>
-        </div>
-
-        <div class="panel-card">
-          <div class="card-header">
-            <div>
-              <p class="eyebrow">Actividad del equipo</p>
-              <h3>Ultimos movimientos</h3>
-            </div>
-            <a class="text-link" href="seguimiento.html">Ir a seguimiento</a>
-          </div>
-
-          <ul class="activity-list">
-            <li>
-              <strong>Nuevo proceso priorizado</strong>
-              <span>LP-2026-014 fue movido a prioridad alta por coincidencia de 96%.</span>
-            </li>
-            <li>
-              <strong>Bases en revision</strong>
-              <span>El equipo legal esta revisando documentos del proceso AS-2026-087.</span>
-            </li>
-            <li>
-              <strong>Oferta enviada</strong>
-              <span>CP-2026-102 paso a estado postulacion enviada.</span>
-            </li>
-            <li>
-              <strong>Reporte compartido</strong>
-              <span>Se envio un resumen diario al equipo comercial y gerencia.</span>
-            </li>
-          </ul>
+          <canvas id="trendsChart"></canvas>
         </div>
       </section>
 
-      <section class="bottom-grid">
-        <div class="panel-card">
-          <div class="card-header">
-            <div>
-              <p class="eyebrow">Flujo recomendado</p>
-              <h3>Como se usa el sistema en el dia a dia</h3>
-            </div>
-          </div>
-          <div class="mini-steps">
-            <div><strong>1.</strong><span>Revisar el dashboard para detectar urgencias.</span></div>
-            <div><strong>2.</strong><span>Entrar a oportunidades para filtrar y comparar procesos.</span></div>
-            <div><strong>3.</strong><span>Abrir el detalle para analizar bases, riesgos y ajuste comercial.</span></div>
-            <div><strong>4.</strong><span>Pasar a seguimiento para asignar tareas y monitorear avances.</span></div>
-          </div>
+      <section class="filters-section">
+        <div class="filter-group">
+          <label for="dateFilter">Periodo:</label>
+          <select id="dateFilter" onchange="loadDashboardMetrics()">
+            <option value="30">Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+            <option value="180">Últimos 6 meses</option>
+            <option value="365">Último año</option>
+            <option value="all">Todo el historial</option>
+          </select>
         </div>
-
-        <div class="panel-card">
-          <div class="card-header">
-            <div>
-              <p class="eyebrow">Alertas</p>
-              <h3>Centro de eventos</h3>
-            </div>
-            <a class="text-link" href="alertas.html">Abrir alertas</a>
-          </div>
-          <div class="mini-stats">
-            <div>
-              <strong>3</strong>
-              <span>criticas</span>
-            </div>
-            <div>
-              <strong>12</strong>
-              <span>pendientes</span>
-            </div>
-            <div>
-              <strong>36</strong>
-              <span>reglas activas</span>
-            </div>
-          </div>
-        </div>
+        <button class="secondary-button" onclick="exportDashboard()">Exportar dashboard</button>
       </section>
 
       <p id="message" class="message" aria-live="polite"></p>

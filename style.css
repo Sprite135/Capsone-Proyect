@@ -533,6 +533,76 @@ input.search-box:focus {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+.chart-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card .card-header {
+  flex-shrink: 0;
+}
+
+.chart-card canvas {
+  flex: 1;
+  max-height: 300px;
+  width: 100% !important;
+}
+
+.filters-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+}
+
+.filters-section .filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filters-section .filter-group label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.filters-section .filter-group select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.filters-section .filter-group select:hover {
+  border-color: var(--accent);
+}
+
+.filters-section .filter-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
 .summary-strip {
   grid-template-columns: repeat(3, 1fr);
 }

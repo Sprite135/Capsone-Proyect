@@ -130,11 +130,22 @@ app.MapGet("/api/health", () => Results.Ok(new
     service = "LicitIA API"
 }));
 
-app.MapGet("/api/opportunities", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+app.MapGet("/api/opportunities", async (
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int? days = null) =>
 {
     try
     {
         var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        // Filter by date if specified
+        if (days.HasValue)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days.Value);
+            opportunities = opportunities.Where(o => o.PublishedDate.HasValue && o.PublishedDate >= cutoffDate).ToList();
+        }
+        
         return Results.Ok(opportunities.Select(OpportunityResponse.FromModel));
     }
     catch (SqlException)
@@ -252,11 +263,21 @@ app.MapGet("/api/opportunities/entities", async (OpportunityRepository repositor
 });
 
 // Metrics endpoints for dashboard
-app.MapGet("/api/metrics/summary", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+app.MapGet("/api/metrics/summary", async (
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int? days = null) =>
 {
     try
     {
         var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        // Filter by date if specified
+        if (days.HasValue)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days.Value);
+            opportunities = opportunities.Where(o => o.PublishedDate.HasValue && o.PublishedDate >= cutoffDate).ToList();
+        }
         
         var summary = new
         {
@@ -279,11 +300,21 @@ app.MapGet("/api/metrics/summary", async (OpportunityRepository repository, Canc
     }
 });
 
-app.MapGet("/api/metrics/by-category", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+app.MapGet("/api/metrics/by-category", async (
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int? days = null) =>
 {
     try
     {
         var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        // Filter by date if specified
+        if (days.HasValue)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days.Value);
+            opportunities = opportunities.Where(o => o.PublishedDate.HasValue && o.PublishedDate >= cutoffDate).ToList();
+        }
         
         var byCategory = opportunities
             .Where(o => !string.IsNullOrWhiteSpace(o.Category))
@@ -309,11 +340,21 @@ app.MapGet("/api/metrics/by-category", async (OpportunityRepository repository, 
     }
 });
 
-app.MapGet("/api/metrics/by-entity", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+app.MapGet("/api/metrics/by-entity", async (
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int? days = null) =>
 {
     try
     {
         var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        // Filter by date if specified
+        if (days.HasValue)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days.Value);
+            opportunities = opportunities.Where(o => o.PublishedDate.HasValue && o.PublishedDate >= cutoffDate).ToList();
+        }
         
         var byEntity = opportunities
             .Where(o => !string.IsNullOrWhiteSpace(o.EntityName))
@@ -334,6 +375,47 @@ app.MapGet("/api/metrics/by-entity", async (OpportunityRepository repository, Ca
     {
         return Results.Problem(
             title: "No se pudieron obtener las métricas por entidad.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapGet("/api/metrics/trends", async (
+    OpportunityRepository repository,
+    CancellationToken cancellationToken,
+    [FromQuery] int? days = null) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        // Filter by date if specified
+        if (days.HasValue)
+        {
+            var cutoffDate = DateTime.UtcNow.AddDays(-days.Value);
+            opportunities = opportunities.Where(o => o.PublishedDate.HasValue && o.PublishedDate >= cutoffDate).ToList();
+        }
+        
+        var trends = opportunities
+            .Where(o => o.PublishedDate.HasValue)
+            .GroupBy(o => new { Year = o.PublishedDate.Value.Year, Month = o.PublishedDate.Value.Month })
+            .OrderBy(g => g.Key.Year)
+            .ThenBy(g => g.Key.Month)
+            .Select(g => new
+            {
+                year = g.Key.Year,
+                month = g.Key.Month,
+                count = g.Count(),
+                totalAmount = g.Sum(o => o.EstimatedAmount)
+            })
+            .ToList();
+        
+        return Results.Ok(trends);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las tendencias.",
             detail: ex.Message,
             statusCode: StatusCodes.Status500InternalServerError);
     }
