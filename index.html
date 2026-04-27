@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="dashboard.js"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -83,24 +85,41 @@
       <section class="stats-grid">
         <article class="stat-card">
           <p>Convocatorias activas</p>
-          <strong>126</strong>
-          <span>+14 desde ayer</span>
+          <strong id="total-opportunities">-</strong>
+          <span id="total-categories">- categorías</span>
         </article>
         <article class="stat-card">
           <p>Coincidencia promedio</p>
-          <strong>92%</strong>
-          <span>sobre la lista recomendada</span>
+          <strong id="average-score">-%</strong>
+          <span>Score de afinidad</span>
         </article>
         <article class="stat-card">
-          <p>Procesos en seguimiento</p>
-          <strong>34</strong>
-          <span>6 con fecha limite esta semana</span>
+          <p>Oportunidades prioritarias</p>
+          <strong id="priority-opportunities">-</strong>
+          <span>Alta afinidad comercial</span>
         </article>
         <article class="stat-card">
-          <p>Alertas emitidas</p>
-          <strong>51</strong>
-          <span>correo, panel y recordatorios</span>
+          <p>Monto total</p>
+          <strong id="total-amount">S/ -</strong>
+          <span>Valor estimado</span>
         </article>
+      </section>
+
+      <section class="charts-grid">
+        <div class="chart-card">
+          <div class="card-header">
+            <p class="eyebrow">Distribución por categoría</p>
+            <h3>Oportunidades por rubro</h3>
+          </div>
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <p class="eyebrow">Top entidades</p>
+            <h3>Entidades con más oportunidades</h3>
+          </div>
+          <canvas id="entityChart"></canvas>
+        </div>
       </section>
 
       <section class="content-grid">

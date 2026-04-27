@@ -251,6 +251,94 @@ app.MapGet("/api/opportunities/entities", async (OpportunityRepository repositor
     }
 });
 
+// Metrics endpoints for dashboard
+app.MapGet("/api/metrics/summary", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        var summary = new
+        {
+            totalOpportunities = opportunities.Count,
+            priorityOpportunities = opportunities.Count(o => o.IsPriority),
+            totalAmount = opportunities.Sum(o => o.EstimatedAmount),
+            averageScore = opportunities.Any() ? opportunities.Average(o => o.MatchScore) : 0,
+            categories = opportunities.Select(o => o.Category).Distinct().Count(),
+            entities = opportunities.Select(o => o.EntityName).Distinct().Count()
+        };
+        
+        return Results.Ok(summary);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las métricas.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapGet("/api/metrics/by-category", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        var byCategory = opportunities
+            .Where(o => !string.IsNullOrWhiteSpace(o.Category))
+            .GroupBy(o => o.Category)
+            .Select(g => new
+            {
+                category = g.Key,
+                count = g.Count(),
+                totalAmount = g.Sum(o => o.EstimatedAmount),
+                averageScore = g.Average(o => o.MatchScore)
+            })
+            .OrderByDescending(g => g.count)
+            .ToList();
+        
+        return Results.Ok(byCategory);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las métricas por categoría.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
+app.MapGet("/api/metrics/by-entity", async (OpportunityRepository repository, CancellationToken cancellationToken) =>
+{
+    try
+    {
+        var opportunities = await repository.GetAllAsync(cancellationToken);
+        
+        var byEntity = opportunities
+            .Where(o => !string.IsNullOrWhiteSpace(o.EntityName))
+            .GroupBy(o => o.EntityName)
+            .Select(g => new
+            {
+                entity = g.Key,
+                count = g.Count(),
+                totalAmount = g.Sum(o => o.EstimatedAmount)
+            })
+            .OrderByDescending(g => g.count)
+            .Take(10)
+            .ToList();
+        
+        return Results.Ok(byEntity);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "No se pudieron obtener las métricas por entidad.",
+            detail: ex.Message,
+            statusCode: StatusCodes.Status500InternalServerError);
+    }
+});
+
 app.MapPost("/api/auth/register", async (
     RegisterRequest request,
     AuthRepository repository,
