@@ -47,6 +47,34 @@ builder.Services.AddSingleton<AffinityService>();
 builder.Services.AddHttpClient<OeceDataService>();
 builder.Services.AddHttpClient<OeceApiService>();
 
+// Add Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "LicitIA API",
+        Version = "v1",
+        Description = "API para gestión de oportunidades de licitaciones públicas en Perú"
+    });
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "LicitIA.Api.xml"));
+    c.TagActionsBy(api =>
+    {
+        if (api.RelativePath.Contains("health"))
+            return new[] { "Health" };
+        if (api.RelativePath.Contains("opportunities"))
+            return new[] { "Oportunidades" };
+        if (api.RelativePath.Contains("auth"))
+            return new[] { "Autenticación" };
+        if (api.RelativePath.Contains("seace"))
+            return new[] { "SEACE Scraping" };
+        if (api.RelativePath.Contains("oece"))
+            return new[] { "OECE Scraping" };
+        if (api.RelativePath.Contains("profile"))
+            return new[] { "Perfil de Usuario" };
+        return new[] { "General" };
+    });
+});
 
 var app = builder.Build();
 
@@ -66,6 +94,14 @@ app.UseExceptionHandler(exceptionApp =>
 });
 
 app.UseCors();
+
+// Enable Swagger
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LicitIA API v1");
+    c.RoutePrefix = "swagger";
+});
 
 // Serve static frontend files - find the project root by looking for home.html
 var contentRoot = builder.Environment.ContentRootPath;
