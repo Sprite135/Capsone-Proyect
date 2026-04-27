@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LicitIA.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+24c6888be4672b8d6dd5b01dc62f9fe8d5a6d363")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+884df68bcf2f6124aec5153cbce998039786dc1d")]
 [assembly: System.Reflection.AssemblyProductAttribute("LicitIA.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LicitIA.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
