@@ -1,6 +1,65 @@
 const API_BASE = "http://localhost:5153";
 const authForm = document.querySelector("[data-auth-form]");
 const formStatus = document.getElementById("formStatus");
+const googleButtons = document.querySelectorAll(".google-button");
+
+window.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "licitia-google-auth") {
+    return;
+  }
+
+  if (event.data.error) {
+    setStatus(`Error en autenticacion de Google: ${event.data.error}`, "error");
+    return;
+  }
+
+  if (event.data.token) {
+    try {
+      localStorage.setItem("authToken", event.data.token);
+      window.AUTH_TOKEN = event.data.token;
+    } catch (e) {
+      // ignore storage errors
+    }
+  }
+
+  window.location.href = event.data.redirectUrl || "index.html";
+});
+
+googleButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    openGoogleAuthWindow(button.getAttribute("href") || "/api/auth/google/login");
+  });
+});
+
+function openGoogleAuthWindow(authUrl) {
+  const url = authUrl.startsWith("http") ? authUrl : `${API_BASE}${authUrl}`;
+  const width = 520;
+  const height = 680;
+  const left = Math.max(0, window.screenX + (window.outerWidth - width) / 2);
+  const top = Math.max(0, window.screenY + (window.outerHeight - height) / 2);
+  const features = [
+    `width=${width}`,
+    `height=${height}`,
+    `left=${Math.round(left)}`,
+    `top=${Math.round(top)}`,
+    "popup=yes",
+    "toolbar=no",
+    "menubar=no",
+    "location=no",
+    "status=no",
+    "resizable=yes",
+    "scrollbars=yes"
+  ].join(",");
+
+  const popup = window.open(url, "licitia-google-auth", features);
+  if (!popup) {
+    setStatus("El navegador bloqueo la ventana de Google. Permite ventanas emergentes para iniciar sesion.", "error");
+    return;
+  }
+
+  popup.focus();
+}
 
 if (authForm) {
   authForm.addEventListener("submit", async (event) => {
@@ -149,6 +208,16 @@ document.addEventListener("click", (e) => {
       window.AUTH_TOKEN = token;
     } catch (e) {
       // ignore storage errors
+    }
+
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage({
+        type: 'licitia-google-auth',
+        token,
+        redirectUrl: 'index.html'
+      }, '*');
+      window.close();
+      return;
     }
 
     // Clean URL and redirect to dashboard

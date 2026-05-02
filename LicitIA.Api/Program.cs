@@ -1265,12 +1265,12 @@ app.MapGet("/api/auth/google/callback", async (
 {
     if (!string.IsNullOrWhiteSpace(error))
     {
-        return Results.Redirect($"/registro.html?error={Uri.EscapeDataString(error)}");
+        return GoogleAuthPopupResult(error: error);
     }
 
     if (string.IsNullOrWhiteSpace(code))
     {
-        return Results.Redirect("/registro.html?error=no_code");
+        return GoogleAuthPopupResult(error: "no_code");
     }
 
     try
@@ -1295,13 +1295,13 @@ app.MapGet("/api/auth/google/callback", async (
             Console.WriteLine($"[GoogleAuth] ClientId: {authOptions.Value.ClientId?.Substring(0, 20)}...");
             Console.WriteLine($"[GoogleAuth] RedirectUri: {authOptions.Value.RedirectUri}");
             var errorSummary = Uri.EscapeDataString(errorBody.Length > 100 ? errorBody[..100] : errorBody);
-            return Results.Redirect($"/registro.html?error=token_exchange&details={errorSummary}");
+            return GoogleAuthPopupResult(error: $"token_exchange&details={errorSummary}");
         }
 
         var tokenData = await tokenResponse.Content.ReadFromJsonAsync<GoogleTokenResponse>(cancellationToken);
         if (tokenData?.AccessToken is null)
         {
-            return Results.Redirect("/registro.html?error=no_access_token");
+            return GoogleAuthPopupResult(error: "no_access_token");
         }
 
         // Get user info from Google
@@ -1311,13 +1311,13 @@ app.MapGet("/api/auth/google/callback", async (
 
         if (!userInfoResponse.IsSuccessStatusCode)
         {
-            return Results.Redirect("/registro.html?error=user_info");
+            return GoogleAuthPopupResult(error: "user_info");
         }
 
         var googleUser = await userInfoResponse.Content.ReadFromJsonAsync<GoogleUserInfo>(cancellationToken);
         if (googleUser is null || string.IsNullOrWhiteSpace(googleUser.Email))
         {
-            return Results.Redirect("/registro.html?error=no_email");
+            return GoogleAuthPopupResult(error: "no_email");
         }
 
         // Check if user exists
@@ -1364,12 +1364,13 @@ app.MapGet("/api/auth/google/callback", async (
         // Redirect to frontend with token
         // New users go to complete profile page, existing users go to dashboard
         var redirectPage = isNewUser ? "completar-perfil.html" : "index.html";
-        return Results.Redirect($"/{redirectPage}?token={Uri.EscapeDataString(jwtToken)}&name={Uri.EscapeDataString(user.FullName)}&email={Uri.EscapeDataString(user.Email)}&new={isNewUser}");
+        var fallbackUrl = $"/{redirectPage}?token={Uri.EscapeDataString(jwtToken)}&name={Uri.EscapeDataString(user.FullName)}&email={Uri.EscapeDataString(user.Email)}&new={isNewUser}";
+        return GoogleAuthPopupResult(jwtToken, redirectPage, fallbackUrl);
     }
     catch (Exception ex)
     {
         Console.WriteLine($"[GoogleAuth] Exception: {ex.Message}");
-        return Results.Redirect("/registro.html?error=exception");
+        return GoogleAuthPopupResult(error: "exception");
     }
 });
 
@@ -1559,6 +1560,49 @@ static string? FindFrontendRoot(string startPath)
 
     Console.WriteLine($"[StaticFiles] WARNING: Could not find home.html. Searched from: {startPath}");
     return null;
+}
+
+static IResult GoogleAuthPopupResult(string? token = null, string? redirectUrl = null, string? fallbackUrl = null, string? error = null)
+{
+    var payload = JsonSerializer.Serialize(new
+    {
+        type = "licitia-google-auth",
+        token,
+        redirectUrl,
+        error
+    });
+
+    var fallback = error is null
+        ? fallbackUrl ?? $"/{redirectUrl ?? "index.html"}"
+        : $"/registro.html?error={Uri.EscapeDataString(error)}";
+
+    var fallbackJson = JsonSerializer.Serialize(fallback);
+    var html = $$"""
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>LicitIA | Google</title>
+        </head>
+        <body>
+          <script>
+            (function () {
+              var payload = {{payload}};
+              if (window.opener && !window.opener.closed) {
+                window.opener.postMessage(payload, "*");
+                window.close();
+                return;
+              }
+
+              window.location.replace({{fallbackJson}});
+            })();
+          </script>
+        </body>
+        </html>
+        """;
+
+    return Results.Content(html, "text/html; charset=utf-8");
 }
 
 static async Task AutoUpdateOeceData(OeceDataService oeceService, OpportunityRepository repository)
