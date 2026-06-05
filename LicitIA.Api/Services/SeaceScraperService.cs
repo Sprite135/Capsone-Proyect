@@ -1497,6 +1497,17 @@ public class SeaceScraperService
             Console.WriteLine($"[SeaceScraper] No se pudo seleccionar el anio desde el combo visible: {ex.Message}");
         }
 
+        if (await SelectPrimeFacesComboAsync(
+            page,
+            "tbBuscador:idFormBuscarProceso:anioConvocatoria",
+            null,
+            yearText,
+            "Anio de Convocatoria",
+            postSelectDelayMs: 150))
+        {
+            return;
+        }
+
         try
         {
             var applied = await page.EvaluateAsync<bool>(
@@ -1562,6 +1573,260 @@ public class SeaceScraperService
         }
 
         await Task.Delay(300);
+    }
+
+    private async Task<bool> SelectPrimeFacesComboAsync(
+        IPage page,
+        string fixedRootId,
+        string? labelText,
+        string optionText,
+        string logName,
+        string? stopAtLabelText = null,
+        int timeoutMs = 10000,
+        int postSelectDelayMs = 200)
+    {
+        if (string.IsNullOrWhiteSpace(optionText))
+        {
+            return false;
+        }
+
+        try
+        {
+            await WaitForPrimeFacesIdleAsync(page);
+
+            var args = new
+            {
+                fixedRootId,
+                labelText,
+                optionText,
+                stopAtLabelText
+            };
+
+            await page.WaitForFunctionAsync(
+                @"(args) => {
+                    const normalize = (value) => String(value || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toLowerCase();
+
+                    const findRoot = () => {
+                        const fixedRoot = args.fixedRootId ? document.getElementById(args.fixedRootId) : null;
+                        if (fixedRoot && fixedRoot.offsetParent !== null) return fixedRoot;
+
+                        const targetLabel = normalize(args.labelText);
+                        if (!targetLabel) return fixedRoot;
+
+                        const cells = Array.from(document.querySelectorAll('td, th'));
+                        const labelCell = cells.find(cell => normalize(cell.textContent) === targetLabel);
+                        let current = labelCell?.nextElementSibling;
+                        const stopAt = normalize(args.stopAtLabelText);
+
+                        while (current) {
+                            const root = current.querySelector?.('.ui-selectonemenu');
+                            if (root && root.offsetParent !== null) return root;
+                            if (stopAt && normalize(current.textContent).includes(stopAt)) break;
+                            current = current.nextElementSibling;
+                        }
+
+                        return null;
+                    };
+
+                    return Boolean(findRoot());
+                }",
+                args,
+                new PageWaitForFunctionOptions { Timeout = timeoutMs });
+
+            var opened = await page.EvaluateAsync<bool>(
+                @"(args) => {
+                    const normalize = (value) => String(value || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toLowerCase();
+
+                    const findRoot = () => {
+                        const fixedRoot = args.fixedRootId ? document.getElementById(args.fixedRootId) : null;
+                        if (fixedRoot && fixedRoot.offsetParent !== null) return fixedRoot;
+
+                        const targetLabel = normalize(args.labelText);
+                        if (!targetLabel) return fixedRoot;
+
+                        const cells = Array.from(document.querySelectorAll('td, th'));
+                        const labelCell = cells.find(cell => normalize(cell.textContent) === targetLabel);
+                        let current = labelCell?.nextElementSibling;
+                        const stopAt = normalize(args.stopAtLabelText);
+
+                        while (current) {
+                            const root = current.querySelector?.('.ui-selectonemenu');
+                            if (root && root.offsetParent !== null) return root;
+                            if (stopAt && normalize(current.textContent).includes(stopAt)) break;
+                            current = current.nextElementSibling;
+                        }
+
+                        return null;
+                    };
+
+                    const root = findRoot();
+                    if (!root) return false;
+
+                    const trigger = root.querySelector('.ui-selectonemenu-trigger');
+                    const label = root.querySelector('.ui-selectonemenu-label') || document.getElementById(root.id + '_label');
+                    const clickable = trigger || label || root;
+                    clickable.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+                    clickable.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                    clickable.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+                    clickable.click();
+                    return true;
+                }",
+                args);
+
+            Console.WriteLine(opened
+                ? $"[SeaceScraper] Combo {logName} abierto."
+                : $"[SeaceScraper] No se pudo abrir el combo {logName}.");
+
+            await page.WaitForFunctionAsync(
+                @"(args) => {
+                    const normalize = (value) => String(value || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toLowerCase();
+
+                    const findRoot = () => {
+                        const fixedRoot = args.fixedRootId ? document.getElementById(args.fixedRootId) : null;
+                        if (fixedRoot && fixedRoot.offsetParent !== null) return fixedRoot;
+
+                        const targetLabel = normalize(args.labelText);
+                        if (!targetLabel) return fixedRoot;
+
+                        const cells = Array.from(document.querySelectorAll('td, th'));
+                        const labelCell = cells.find(cell => normalize(cell.textContent) === targetLabel);
+                        let current = labelCell?.nextElementSibling;
+                        const stopAt = normalize(args.stopAtLabelText);
+
+                        while (current) {
+                            const root = current.querySelector?.('.ui-selectonemenu');
+                            if (root && root.offsetParent !== null) return root;
+                            if (stopAt && normalize(current.textContent).includes(stopAt)) break;
+                            current = current.nextElementSibling;
+                        }
+
+                        return null;
+                    };
+
+                    const root = findRoot();
+                    const panel = root?.id ? document.getElementById(root.id + '_panel') : null;
+                    return Boolean(panel && panel.querySelector('li.ui-selectonemenu-item'));
+                }",
+                args,
+                new PageWaitForFunctionOptions { Timeout = timeoutMs });
+
+            var selected = await page.EvaluateAsync<bool>(
+                @"(args) => {
+                    const normalize = (value) => String(value || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toLowerCase();
+
+                    const findRoot = () => {
+                        const fixedRoot = args.fixedRootId ? document.getElementById(args.fixedRootId) : null;
+                        if (fixedRoot && fixedRoot.offsetParent !== null) return fixedRoot;
+
+                        const targetLabel = normalize(args.labelText);
+                        if (!targetLabel) return fixedRoot;
+
+                        const cells = Array.from(document.querySelectorAll('td, th'));
+                        const labelCell = cells.find(cell => normalize(cell.textContent) === targetLabel);
+                        let current = labelCell?.nextElementSibling;
+                        const stopAt = normalize(args.stopAtLabelText);
+
+                        while (current) {
+                            const root = current.querySelector?.('.ui-selectonemenu');
+                            if (root && root.offsetParent !== null) return root;
+                            if (stopAt && normalize(current.textContent).includes(stopAt)) break;
+                            current = current.nextElementSibling;
+                        }
+
+                        return null;
+                    };
+
+                    const root = findRoot();
+                    const panel = root?.id ? document.getElementById(root.id + '_panel') : null;
+                    if (!panel) return false;
+
+                    const target = normalize(args.optionText);
+                    const items = Array.from(panel.querySelectorAll('li.ui-selectonemenu-item'));
+                    const option = items.find(item => normalize(item.getAttribute('data-label') || item.textContent) === target);
+                    if (!option) return false;
+
+                    option.click();
+                    return true;
+                }",
+                args);
+
+            if (!selected)
+            {
+                Console.WriteLine($"[SeaceScraper] No se encontro la opcion '{optionText}' en el combo {logName}.");
+                return false;
+            }
+
+            await WaitForPrimeFacesIdleAsync(page);
+            if (postSelectDelayMs > 0)
+            {
+                await Task.Delay(postSelectDelayMs);
+            }
+
+            var selectedLabel = await page.EvaluateAsync<string>(
+                @"(args) => {
+                    const normalize = (value) => String(value || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toLowerCase();
+
+                    const findRoot = () => {
+                        const fixedRoot = args.fixedRootId ? document.getElementById(args.fixedRootId) : null;
+                        if (fixedRoot) return fixedRoot;
+
+                        const targetLabel = normalize(args.labelText);
+                        if (!targetLabel) return null;
+
+                        const cells = Array.from(document.querySelectorAll('td, th'));
+                        const labelCell = cells.find(cell => normalize(cell.textContent) === targetLabel);
+                        let current = labelCell?.nextElementSibling;
+                        const stopAt = normalize(args.stopAtLabelText);
+
+                        while (current) {
+                            const root = current.querySelector?.('.ui-selectonemenu');
+                            if (root) return root;
+                            if (stopAt && normalize(current.textContent).includes(stopAt)) break;
+                            current = current.nextElementSibling;
+                        }
+
+                        return null;
+                    };
+
+                    const root = findRoot();
+                    const label = root?.querySelector('.ui-selectonemenu-label') || (root?.id ? document.getElementById(root.id + '_label') : null);
+                    return (label?.textContent || '').trim();
+                }",
+                args);
+
+            Console.WriteLine($"[SeaceScraper] {logName} seleccionado en UI: {selectedLabel}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SeaceScraper] Helper PrimeFaces no pudo seleccionar {logName}: {ex.Message}");
+            return false;
+        }
     }
 
     private async Task ApplyContractObjectFilterAsync(IPage page, string? contractObject)
@@ -1762,6 +2027,18 @@ public class SeaceScraperService
         catch (Exception ex)
         {
             Console.WriteLine($"[SeaceScraper] No se pudo seleccionar Objeto de Contratacion desde el combo visible j_idt211: {ex.Message}");
+        }
+
+        if (await SelectPrimeFacesComboAsync(
+            page,
+            "tbBuscador:idFormBuscarProceso:j_idt211",
+            "Objeto de Contratacion",
+            optionText,
+            "Objeto de Contratacion",
+            "Tipo de Seleccion",
+            postSelectDelayMs: 150))
+        {
+            return;
         }
 
         try
@@ -2063,6 +2340,16 @@ public class SeaceScraperService
         {
             Console.WriteLine($"[SeaceScraper] No se pudo seleccionar Departamento desde el combo visible: {ex.Message}");
         }
+
+        await SelectPrimeFacesComboAsync(
+            page,
+            "tbBuscador:idFormBuscarProceso:departamento",
+            "Departamento",
+            optionText,
+            "Departamento",
+            "Provincia",
+            15000,
+            postSelectDelayMs: 80);
     }
 
     private async Task ApplyProvinceFilterAsync(IPage page, string? province)
@@ -2147,6 +2434,16 @@ public class SeaceScraperService
         {
             Console.WriteLine($"[SeaceScraper] No se pudo seleccionar Provincia desde el combo visible: {ex.Message}");
         }
+
+        await SelectPrimeFacesComboAsync(
+            page,
+            "tbBuscador:idFormBuscarProceso:provincia",
+            "Provincia",
+            optionText,
+            "Provincia",
+            "Distrito",
+            15000,
+            postSelectDelayMs: 80);
     }
 
     private async Task ApplyDistrictFilterAsync(IPage page, string? district)
@@ -2231,6 +2528,16 @@ public class SeaceScraperService
         {
             Console.WriteLine($"[SeaceScraper] No se pudo seleccionar Distrito desde el combo visible: {ex.Message}");
         }
+
+        await SelectPrimeFacesComboAsync(
+            page,
+            "tbBuscador:idFormBuscarProceso:distrito",
+            "Distrito",
+            optionText,
+            "Distrito",
+            "Tipo de Compra",
+            15000,
+            postSelectDelayMs: 60);
     }
 
     private async Task ApplyObjectDescriptionFilterAsync(IPage page, string? objectDescription)
