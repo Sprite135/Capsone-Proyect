@@ -446,10 +446,8 @@ public class SeaceScraperService
             }
 
             await ApplyCallYearFilterAsync(page, callYear);
-            await WaitForPrimeFacesIdleAsync(page);
             await ApplyContractObjectFilterAsync(page, contractObject);
             await EnsureAdvancedSearchExpandedAsync(page, entityAcronym, department, province, district);
-            await WaitForPrimeFacesIdleAsync(page);
             await ApplyEntityAcronymFilterAsync(page, entityAcronym);
             await ApplyDepartmentFilterAsync(page, department);
             await ApplyProvinceFilterAsync(page, province);
@@ -1485,8 +1483,7 @@ public class SeaceScraperService
 
             if (selected)
             {
-                await WaitForPrimeFacesIdleAsync(page);
-                await Task.Delay(500);
+                await WaitForTextInSelectorAsync(page, "#tbBuscador\\:idFormBuscarProceso\\:anioConvocatoria_label", yearText, "Anio de Convocatoria");
                 var selectedLabel = await page.TextContentAsync("#tbBuscador\\:idFormBuscarProceso\\:anioConvocatoria_label");
                 Console.WriteLine($"[SeaceScraper] Anio de Convocatoria seleccionado en UI: {selectedLabel}");
                 return;
@@ -1572,7 +1569,31 @@ public class SeaceScraperService
             Console.WriteLine($"[SeaceScraper] No se confirmo fin de AJAX de PrimeFaces: {ex.Message}");
         }
 
-        await Task.Delay(300);
+        await Task.Delay(75);
+    }
+
+    private async Task WaitForTextInSelectorAsync(IPage page, string selector, string expectedText, string logName, int timeoutMs = 2500)
+    {
+        try
+        {
+            await page.WaitForFunctionAsync(
+                @"(args) => {
+                    const normalize = value => String(value || '')
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .toLowerCase();
+                    const element = document.querySelector(args.selector);
+                    return Boolean(element && normalize(element.textContent).includes(normalize(args.expectedText)));
+                }",
+                new { selector, expectedText },
+                new PageWaitForFunctionOptions { Timeout = timeoutMs });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[SeaceScraper] No se confirmo visualmente {logName}: {ex.Message}");
+        }
     }
 
     private async Task<bool> SelectPrimeFacesComboAsync(
@@ -1592,7 +1613,7 @@ public class SeaceScraperService
 
         try
         {
-            await WaitForPrimeFacesIdleAsync(page);
+            await WaitForPrimeFacesIdleAsync(page, 3000);
 
             var args = new
             {
@@ -1776,7 +1797,7 @@ public class SeaceScraperService
                 return false;
             }
 
-            await WaitForPrimeFacesIdleAsync(page);
+            await WaitForPrimeFacesIdleAsync(page, 3000);
             if (postSelectDelayMs > 0)
             {
                 await Task.Delay(postSelectDelayMs);
@@ -2008,8 +2029,7 @@ public class SeaceScraperService
 
             if (selected)
             {
-                await WaitForPrimeFacesIdleAsync(page);
-                await Task.Delay(500);
+                await WaitForPrimeFacesIdleAsync(page, 2500);
                 var selectedLabel = await page.EvaluateAsync<string>(
                     @"() => {
                         const root = document.getElementById('tbBuscador:idFormBuscarProceso:j_idt211')
@@ -2195,8 +2215,6 @@ public class SeaceScraperService
                 }",
                 null,
                 new PageWaitForFunctionOptions { Timeout = 10000 });
-
-            await WaitForPrimeFacesIdleAsync(page);
         }
         catch (Exception ex)
         {
@@ -2330,7 +2348,7 @@ public class SeaceScraperService
 
             if (selected)
             {
-                await Task.Delay(500);
+                await WaitForTextInSelectorAsync(page, labelSelector, optionText, "Departamento");
                 var selectedLabel = await page.TextContentAsync(labelSelector);
                 Console.WriteLine($"[SeaceScraper] Departamento seleccionado en UI: {selectedLabel}");
                 return;
@@ -2422,7 +2440,7 @@ public class SeaceScraperService
 
             if (selected)
             {
-                await Task.Delay(500);
+                await WaitForTextInSelectorAsync(page, labelSelector, optionText, "Provincia");
                 var selectedLabel = await page.TextContentAsync(labelSelector);
                 Console.WriteLine($"[SeaceScraper] Provincia seleccionada en UI: {selectedLabel}");
                 return;
@@ -2516,7 +2534,7 @@ public class SeaceScraperService
 
             if (selected)
             {
-                await Task.Delay(500);
+                await WaitForTextInSelectorAsync(page, labelSelector, optionText, "Distrito");
                 var selectedLabel = await page.TextContentAsync(labelSelector);
                 Console.WriteLine($"[SeaceScraper] Distrito seleccionado en UI: {selectedLabel}");
                 return;
