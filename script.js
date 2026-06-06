@@ -44,6 +44,7 @@ const pdfQuestionInput = document.getElementById("pdfQuestionInput");
 const pdfQuickQuestions = document.getElementById("pdfQuickQuestions");
 const pdfQuickToggle = document.getElementById("pdfQuickToggle");
 const syncSeaceButton = document.getElementById('syncSeaceButton');
+const syncSeaceStatus = document.getElementById("syncSeaceStatus");
 const seaceFilterModal = document.getElementById("seaceFilterModal");
 const closeSeaceFilterModal = document.getElementById("closeSeaceFilterModal");
 const saveSeaceFilterButton = document.getElementById("saveSeaceFilterButton");
@@ -64,6 +65,7 @@ let allOpportunities = [];
 let currentPage = 1;
 const itemsPerPage = 15;
 let lastFilteredCount = 0;
+let syncSeaceStatusTimer = null;
 let profileKeywords = { preferred: [], excluded: [], seaceObjectDescription: "", seaceContractObject: "", seaceEntityAcronym: "", seaceDepartment: "", seaceProvince: "", seaceDistrict: "", seaceCallYear: new Date().getFullYear() };
 let currentProfile = null;
 let currentDetailOpportunityId = null;
@@ -163,6 +165,60 @@ const setMessage = (text) => {
   }
 };
 
+function setSyncSeaceLoading(isLoading, statusText = "") {
+  if (!syncSeaceButton) {
+    return;
+  }
+
+  syncSeaceButton.disabled = isLoading;
+  syncSeaceButton.classList.toggle("is-syncing", isLoading);
+  syncSeaceButton.innerHTML = isLoading
+    ? '<span class="button-spinner" aria-hidden="true"></span><span>Sincronizando...</span>'
+    : "Sincronizar SEACE";
+
+  if (syncSeaceStatus) {
+    syncSeaceStatus.textContent = statusText;
+    syncSeaceStatus.classList.toggle("is-visible", Boolean(isLoading && statusText));
+  }
+}
+
+function startSyncSeaceStatusLoop() {
+  const steps = [
+    "Conectando con SEACE...",
+    "Aplicando filtros guardados...",
+    "Leyendo resultados oficiales...",
+    "Extrayendo detalles y documentos...",
+    "Guardando oportunidades encontradas..."
+  ];
+  let index = 0;
+
+  clearInterval(syncSeaceStatusTimer);
+  setSyncSeaceLoading(true, steps[index]);
+  syncSeaceStatusTimer = setInterval(() => {
+    index = Math.min(index + 1, steps.length - 1);
+    setSyncSeaceLoading(true, steps[index]);
+  }, 3200);
+}
+
+function stopSyncSeaceStatusLoop(finalText = "") {
+  clearInterval(syncSeaceStatusTimer);
+  syncSeaceStatusTimer = null;
+  setSyncSeaceLoading(false);
+
+  if (syncSeaceStatus) {
+    syncSeaceStatus.textContent = finalText;
+    syncSeaceStatus.classList.toggle("is-visible", Boolean(finalText));
+    if (finalText) {
+      setTimeout(() => {
+        if (!syncSeaceStatusTimer) {
+          syncSeaceStatus.textContent = "";
+          syncSeaceStatus.classList.remove("is-visible");
+        }
+      }, 4500);
+    }
+  }
+}
+
 demoButtons.forEach((button) => {
   button.addEventListener("click", () => {
     setMessage(button.dataset.demoMessage);
@@ -183,8 +239,7 @@ if (syncSeaceButton) {
   syncSeaceButton.addEventListener("click", async () => {
     console.log("Click en botón Sincronizar SEACE");
     try {
-      syncSeaceButton.disabled = true;
-      syncSeaceButton.textContent = "Sincronizando...";
+      startSyncSeaceStatusLoop();
       setMessage("Iniciando sincronización con SEACE...");
 
       const token = localStorage.getItem('jwtToken') || localStorage.getItem('authToken');
@@ -227,8 +282,7 @@ if (syncSeaceButton) {
       console.error("Error en sincronización:", error);
       setMessage("Error al sincronizar con SEACE: " + error.message);
     } finally {
-      syncSeaceButton.disabled = false;
-      syncSeaceButton.textContent = "Sincronizar SEACE";
+      stopSyncSeaceStatusLoop();
     }
   });
 } else {
@@ -1030,11 +1084,9 @@ async function saveSeaceFilter() {
 }
 
 async function syncSeace() {
+  let syncStatusText = "";
   try {
-    if (syncSeaceButton) {
-      syncSeaceButton.disabled = true;
-      syncSeaceButton.textContent = "Sincronizando...";
-    }
+    startSyncSeaceStatusLoop();
 
     setMessage("Iniciando sincronizacion con SEACE...");
     const response = await fetch(`${API_BASE}/api/seace/refresh`, {
@@ -1053,14 +1105,13 @@ async function syncSeace() {
     const data = await response.json();
     setMessage(data.message || "Sincronizacion completada exitosamente");
     await loadOpportunities();
+    syncStatusText = "Sincronizacion completada.";
   } catch (error) {
     console.error("Error en sincronizacion:", error);
     setMessage("Error al sincronizar con SEACE: " + error.message);
+    syncStatusText = "No se pudo completar la sincronizacion.";
   } finally {
-    if (syncSeaceButton) {
-      syncSeaceButton.disabled = false;
-      syncSeaceButton.textContent = "Sincronizar SEACE";
-    }
+    stopSyncSeaceStatusLoop(syncStatusText);
   }
 }
 

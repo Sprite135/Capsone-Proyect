@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260518-2">
+  <link rel="stylesheet" href="style.css?v=20260606-1">
 </head>
 <body>
   <div class="app-shell">
@@ -43,9 +43,11 @@
           <h2>Oportunidades para filtrar, comparar y abrir el detalle de cada licitacion</h2>
         </div>
         <div class="topbar-actions">
-          <input class="search-box search-input" id="opportunitySearch" type="search" placeholder="Buscar procesos, entidades o rubros">
           <button class="secondary-button" type="button" id="saveFiltersBtn">Guardar filtros</button>
-          <button class="primary-button" type="button" id="syncSeaceButton">Sincronizar SEACE</button>
+          <div class="sync-action">
+            <button class="primary-button" type="button" id="syncSeaceButton">Sincronizar SEACE</button>
+            <span class="sync-status" id="syncSeaceStatus" aria-live="polite"></span>
+          </div>
           <div class="account-actions">
             <a class="secondary-button logout-button" href="home.html">Cerrar sesion</a>
             <div class="user-chip">ES</div>
@@ -139,8 +141,8 @@
           </div>
         </div>
 
-        <div class="panel-card">
-          <div class="card-header">
+        <div class="panel-card results-card">
+          <div class="card-header results-card-header">
             <div>
               <p class="eyebrow">Resultados</p>
               <h3>Bandeja priorizada</h3>
@@ -151,6 +153,10 @@
               <a href="oportunidades.html" data-tab="recent">Recientes</a>
               <a href="oportunidades.html" data-tab="favorites">Siguiendo</a>
             </div>
+          </div>
+          <div class="results-search-row">
+            <span class="results-search-icon" aria-hidden="true">⌕</span>
+            <input class="search-box search-input results-search" id="opportunitySearch" type="search" placeholder="Buscar procesos, entidades o rubros">
           </div>
 
           <div class="result-list" id="opportunityResults"></div>
@@ -263,6 +269,6 @@
     </section>
   </div>
 
-  <script src="script.js?v=20260518-2"></script>
+  <script src="script.js?v=20260606-1"></script>
 </body>
 </html>
