@@ -3371,6 +3371,51 @@ button:disabled,
   text-align: center;
 }
 
+.empty-opportunities {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 34px 24px;
+  border-style: dashed;
+  background:
+    radial-gradient(circle at top, rgba(78, 143, 255, 0.12), transparent 44%),
+    rgba(15, 23, 42, 0.58);
+}
+
+.empty-opportunities-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(78, 143, 255, 0.42);
+  border-radius: 18px;
+  background: rgba(78, 143, 255, 0.14);
+  color: #7fb0ff;
+  font-size: 1.45rem;
+  font-weight: 900;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18);
+}
+
+.empty-opportunities-copy {
+  max-width: 560px;
+}
+
+.empty-opportunities-copy h4 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 1.15rem;
+}
+
+.empty-opportunities-copy p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.empty-opportunities-action {
+  min-width: 150px;
+}
+
 @media (max-width: 1280px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);

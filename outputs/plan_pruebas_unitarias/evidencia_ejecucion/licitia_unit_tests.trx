@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="282ba8f0-1905-4978-ac96-bca7f8398e33" name="sprit@DESKTOP-QCGQ9F3 2026-06-15 21:35:48" runUser="DESKTOP-QCGQ9F3\CodexSandboxOffline" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-06-15T21:35:48.0643535-05:00" queuing="2026-06-15T21:35:48.0643540-05:00" start="2026-06-15T21:35:47.0716720-05:00" finish="2026-06-15T21:35:48.0741083-05:00" />
+  <TestSettings name="default" id="a58fcd79-959d-4dff-8f35-f3f967bd7e5d">
+    <Deployment runDeploymentRoot="sprit_DESKTOP-QCGQ9F3_2026-06-15_21_35_48" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="6d1adb1d-3cc6-45b8-bc40-6370ad8f8f5f" testId="6d042f34-4d8d-97fe-bdc8-f01a713352ec" testName="LicitIA.Tests.SeaceScraperTests.ParseSeaceDate_InvalidFormat_ReturnsNull" computerName="DESKTOP-QCGQ9F3" duration="00:00:00.0005063" startTime="2026-06-15T21:35:47.9222515-05:00" endTime="2026-06-15T21:35:47.9231579-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d1adb1d-3cc6-45b8-bc40-6370ad8f8f5f" />
+    <UnitTestResult executionId="b0166e43-fc7e-41e8-b566-9a3cdeb567ea" testId="e45b4f71-fd1c-28bc-a7c4-b747da445000" testName="LicitIA.Tests.SeaceScraperTests.ParseSeaceAmount_WithSpaces_ReturnsDecimal" computerName="DESKTOP-QCGQ9F3" duration="00:00:00.0087443" startTime="2026-06-15T21:35:47.8943443-05:00" endTime="2026-06-15T21:35:47.9211341-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b0166e43-fc7e-41e8-b566-9a3cdeb567ea" />
+    <UnitTestResult executionId="59cf8dad-d5c8-4710-9c1e-ebb7b0489a1f" testId="687e30b8-f766-57ba-0205-7e5887e578f8" testName="LicitIA.Tests.SeaceScraperTests.ParseSeaceDate_ValidFormat_ReturnsDateTime" computerName="DESKTOP-QCGQ9F3" duration="00:00:00.0038351" startTime="2026-06-15T21:35:47.9233264-05:00" endTime="2026-06-15T21:35:47.9233844-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="59cf8dad-d5c8-4710-9c1e-ebb7b0489a1f" />
+    <UnitTestResult executionId="ce354f12-b7b2-4f43-9a55-15520bf4f7e6" testId="a57d1b8d-7a1c-67e5-cfd2-16625693e09a" testName="LicitIA.Tests.SeaceScraperTests.ParseSeaceAmount_ValidNumber_ReturnsDecimal" computerName="DESKTOP-QCGQ9F3" duration="00:00:00.0002308" startTime="2026-06-15T21:35:47.9220067-05:00" endTime="2026-06-15T21:35:47.9220762-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ce354f12-b7b2-4f43-9a55-15520bf4f7e6" />
+    <UnitTestResult executionId="8284434c-3e51-48bd-92f0-87da5fbfb3d1" testId="a36a63ef-7da6-99cd-eb2d-dc3bc0f4b770" testName="LicitIA.Tests.UnitTest1.Test1" computerName="DESKTOP-QCGQ9F3" duration="00:00:00.0024212" startTime="2026-06-15T21:35:47.8959685-05:00" endTime="2026-06-15T21:35:47.9045336-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8284434c-3e51-48bd-92f0-87da5fbfb3d1" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="LicitIA.Tests.SeaceScraperTests.ParseSeaceAmount_ValidNumber_ReturnsDecimal" storage="d:\proyecto_respalto_caps\licitia.tests\bin\debug\net10.0\licitia.tests.dll" id="a57d1b8d-7a1c-67e5-cfd2-16625693e09a">
+      <Execution id="ce354f12-b7b2-4f43-9a55-15520bf4f7e6" />
+      <TestMethod codeBase="D:\Proyecto_Respalto_caps\LicitIA.Tests\bin\Debug\net10.0\LicitIA.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="LicitIA.Tests.SeaceScraperTests" name="ParseSeaceAmount_ValidNumber_ReturnsDecimal" />
+    </UnitTest>
+    <UnitTest name="LicitIA.Tests.SeaceScraperTests.ParseSeaceDate_InvalidFormat_ReturnsNull" storage="d:\proyecto_respalto_caps\licitia.tests\bin\debug\net10.0\licitia.tests.dll" id="6d042f34-4d8d-97fe-bdc8-f01a713352ec">
+      <Execution id="6d1adb1d-3cc6-45b8-bc40-6370ad8f8f5f" />
+      <TestMethod codeBase="D:\Proyecto_Respalto_caps\LicitIA.Tests\bin\Debug\net10.0\LicitIA.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="LicitIA.Tests.SeaceScraperTests" name="ParseSeaceDate_InvalidFormat_ReturnsNull" />
+    </UnitTest>
+    <UnitTest name="LicitIA.Tests.SeaceScraperTests.ParseSeaceDate_ValidFormat_ReturnsDateTime" storage="d:\proyecto_respalto_caps\licitia.tests\bin\debug\net10.0\licitia.tests.dll" id="687e30b8-f766-57ba-0205-7e5887e578f8">
+      <Execution id="59cf8dad-d5c8-4710-9c1e-ebb7b0489a1f" />
+      <TestMethod codeBase="D:\Proyecto_Respalto_caps\LicitIA.Tests\bin\Debug\net10.0\LicitIA.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="LicitIA.Tests.SeaceScraperTests" name="ParseSeaceDate_ValidFormat_ReturnsDateTime" />
+    </UnitTest>
+    <UnitTest name="LicitIA.Tests.UnitTest1.Test1" storage="d:\proyecto_respalto_caps\licitia.tests\bin\debug\net10.0\licitia.tests.dll" id="a36a63ef-7da6-99cd-eb2d-dc3bc0f4b770">
+      <Execution id="8284434c-3e51-48bd-92f0-87da5fbfb3d1" />
+      <TestMethod codeBase="D:\Proyecto_Respalto_caps\LicitIA.Tests\bin\Debug\net10.0\LicitIA.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="LicitIA.Tests.UnitTest1" name="Test1" />
+    </UnitTest>
+    <UnitTest name="LicitIA.Tests.SeaceScraperTests.ParseSeaceAmount_WithSpaces_ReturnsDecimal" storage="d:\proyecto_respalto_caps\licitia.tests\bin\debug\net10.0\licitia.tests.dll" id="e45b4f71-fd1c-28bc-a7c4-b747da445000">
+      <Execution id="b0166e43-fc7e-41e8-b566-9a3cdeb567ea" />
+      <TestMethod codeBase="D:\Proyecto_Respalto_caps\LicitIA.Tests\bin\Debug\net10.0\LicitIA.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="LicitIA.Tests.SeaceScraperTests" name="ParseSeaceAmount_WithSpaces_ReturnsDecimal" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="6d042f34-4d8d-97fe-bdc8-f01a713352ec" executionId="6d1adb1d-3cc6-45b8-bc40-6370ad8f8f5f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e45b4f71-fd1c-28bc-a7c4-b747da445000" executionId="b0166e43-fc7e-41e8-b566-9a3cdeb567ea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="687e30b8-f766-57ba-0205-7e5887e578f8" executionId="59cf8dad-d5c8-4710-9c1e-ebb7b0489a1f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a57d1b8d-7a1c-67e5-cfd2-16625693e09a" executionId="ce354f12-b7b2-4f43-9a55-15520bf4f7e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a36a63ef-7da6-99cd-eb2d-dc3bc0f4b770" executionId="8284434c-3e51-48bd-92f0-87da5fbfb3d1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Resultados sin formato de lista" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="Todos los resultados cargados" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="5" executed="5" passed="5" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.9)&#xD;
+[xUnit.net 00:00:00.12]   Discovering: LicitIA.Tests&#xD;
+[xUnit.net 00:00:00.17]   Discovered:  LicitIA.Tests&#xD;
+[xUnit.net 00:00:00.20]   Starting:    LicitIA.Tests&#xD;
+[xUnit.net 00:00:00.27]   Finished:    LicitIA.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

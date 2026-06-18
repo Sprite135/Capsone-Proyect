@@ -1,0 +1,335 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="2700" viewBox="0 0 1800 2700">
+  <style>
+    .page { fill: #ffffff; }
+    .frame { fill: #ffffff; stroke: #111111; stroke-width: 2; }
+    .panel { fill: #f4f4f4; stroke: #111111; stroke-width: 1.5; }
+    .soft { fill: #fafafa; stroke: #333333; stroke-width: 1.2; }
+    .dark { fill: #111111; }
+    .mid { fill: #777777; }
+    .line { stroke: #111111; stroke-width: 2; fill: none; }
+    .thin { stroke: #555555; stroke-width: 1.2; fill: none; }
+    .dash { stroke: #777777; stroke-width: 1.2; stroke-dasharray: 8 7; fill: none; }
+    .txt { font-family: Arial, Helvetica, sans-serif; fill: #111111; font-size: 18px; }
+    .small { font-family: Arial, Helvetica, sans-serif; fill: #333333; font-size: 14px; }
+    .tiny { font-family: Arial, Helvetica, sans-serif; fill: #444444; font-size: 12px; }
+    .label { font-family: Arial, Helvetica, sans-serif; fill: #111111; font-size: 15px; font-weight: 700; letter-spacing: 2px; }
+    .h1 { font-family: Arial, Helvetica, sans-serif; fill: #111111; font-size: 36px; font-weight: 700; }
+    .h2 { font-family: Arial, Helvetica, sans-serif; fill: #111111; font-size: 25px; font-weight: 700; }
+    .h3 { font-family: Arial, Helvetica, sans-serif; fill: #111111; font-size: 20px; font-weight: 700; }
+    .button { fill: #e8e8e8; stroke: #111111; stroke-width: 1.6; }
+    .primary { fill: #111111; stroke: #111111; stroke-width: 1.6; }
+    .whiteText { font-family: Arial, Helvetica, sans-serif; fill: #ffffff; font-size: 16px; font-weight: 700; }
+  </style>
+
+  <rect class="page" x="0" y="0" width="1800" height="2700"/>
+  <text class="h1" x="70" y="65">Mockups blanco y negro - LicitIA</text>
+  <text class="txt" x="70" y="98">Interfaces principales del sistema en formato wireframe para documentacion.</text>
+
+  <!-- M01 Home -->
+  <g transform="translate(70 140)">
+    <text class="label" x="0" y="-18">M01 - PAGINA DE INICIO</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="25" y="25" width="750" height="55" rx="10"/>
+    <rect class="dark" x="45" y="38" width="38" height="32" rx="7"/>
+    <text class="whiteText" x="57" y="60">LI</text>
+    <text class="h3" x="100" y="60">LicitIA</text>
+    <text class="small" x="370" y="58">Modulos</text>
+    <text class="small" x="450" y="58">Flujo</text>
+    <text class="small" x="515" y="58">Vista</text>
+    <rect class="button" x="605" y="35" width="80" height="30" rx="15"/>
+    <text class="tiny" x="620" y="55">Login</text>
+    <rect class="primary" x="695" y="35" width="60" height="30" rx="15"/>
+    <text class="whiteText" x="706" y="56">Alta</text>
+
+    <rect class="panel" x="25" y="105" width="750" height="230" rx="14"/>
+    <text class="label" x="50" y="143">INTELIGENCIA COMERCIAL</text>
+    <text class="h1" x="50" y="188">Encuentra procesos relevantes</text>
+    <text class="h1" x="50" y="230">y activa alertas sin revisar</text>
+    <text class="h1" x="50" y="272">todo SEACE manualmente</text>
+    <line class="thin" x1="50" y1="300" x2="370" y2="300"/>
+    <rect class="primary" x="50" y="315" width="105" height="35" rx="18"/>
+    <text class="whiteText" x="65" y="338">Crear</text>
+    <rect class="button" x="170" y="315" width="120" height="35" rx="18"/>
+    <text class="small" x="190" y="337">Ya tengo</text>
+
+    <rect class="soft" x="470" y="135" width="230" height="160" rx="12"/>
+    <circle class="panel" cx="505" cy="170" r="22"/>
+    <text class="h2" x="492" y="178">18</text>
+    <text class="h2" x="500" y="220">Oportunidades</text>
+    <line class="line" x1="500" y1="255" x2="675" y2="255"/>
+    <line class="thin" x1="500" y1="275" x2="650" y2="275"/>
+    <line class="thin" x1="500" y1="295" x2="625" y2="295"/>
+    <rect class="soft" x="25" y="360" width="230" height="45" rx="8"/>
+    <rect class="soft" x="285" y="360" width="230" height="45" rx="8"/>
+    <rect class="soft" x="545" y="360" width="230" height="45" rx="8"/>
+  </g>
+
+  <!-- M02 Registro -->
+  <g transform="translate(930 140)">
+    <text class="label" x="0" y="-18">M02 - REGISTRO DE USUARIO</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="25" y="25" width="350" height="380" rx="12"/>
+    <text class="label" x="50" y="65">REGISTRO</text>
+    <text class="h1" x="50" y="110">Configura tu cuenta</text>
+    <text class="h1" x="50" y="150">para encontrar</text>
+    <text class="h1" x="50" y="190">oportunidades</text>
+    <rect class="soft" x="50" y="225" width="85" height="55" rx="8"/>
+    <rect class="soft" x="145" y="225" width="85" height="55" rx="8"/>
+    <rect class="soft" x="240" y="225" width="85" height="55" rx="8"/>
+    <rect class="soft" x="50" y="305" width="275" height="70" rx="8"/>
+
+    <rect class="button" x="420" y="35" width="95" height="35" rx="12"/>
+    <text class="small" x="438" y="58">Inicio</text>
+    <rect class="button" x="655" y="35" width="95" height="35" rx="12"/>
+    <text class="small" x="675" y="58">Login</text>
+    <text class="label" x="420" y="110">CREA TU CUENTA</text>
+    <text class="h1" x="420" y="152">Registro</text>
+    <rect class="button" x="420" y="180" width="330" height="40" rx="10"/>
+    <text class="small" x="535" y="205">Continuar con Gmail</text>
+    <line class="thin" x1="420" y1="245" x2="750" y2="245"/>
+    <rect class="soft" x="420" y="270" width="155" height="42" rx="8"/>
+    <rect class="soft" x="595" y="270" width="155" height="42" rx="8"/>
+    <rect class="soft" x="420" y="330" width="155" height="42" rx="8"/>
+    <rect class="soft" x="595" y="330" width="155" height="42" rx="8"/>
+    <rect class="primary" x="420" y="385" width="330" height="35" rx="10"/>
+    <text class="whiteText" x="535" y="408">Crear cuenta</text>
+  </g>
+
+  <!-- M03 Login -->
+  <g transform="translate(70 620)">
+    <text class="label" x="0" y="-18">M03 - INICIO DE SESION</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="25" y="25" width="350" height="380" rx="12"/>
+    <text class="label" x="50" y="65">ACCESO SEGURO</text>
+    <text class="h1" x="50" y="110">Vuelve al centro</text>
+    <text class="h1" x="50" y="150">de decisiones de</text>
+    <text class="h1" x="50" y="190">licitaciones</text>
+    <rect class="soft" x="50" y="230" width="85" height="60" rx="8"/>
+    <rect class="soft" x="145" y="230" width="85" height="60" rx="8"/>
+    <rect class="soft" x="240" y="230" width="85" height="60" rx="8"/>
+    <rect class="soft" x="50" y="315" width="275" height="55" rx="8"/>
+
+    <rect class="button" x="420" y="35" width="95" height="35" rx="12"/>
+    <text class="small" x="438" y="58">Inicio</text>
+    <rect class="button" x="655" y="35" width="95" height="35" rx="12"/>
+    <text class="small" x="665" y="58">Registro</text>
+    <text class="label" x="420" y="110">LOGIN</text>
+    <text class="h1" x="420" y="152">Accede a tu cuenta</text>
+    <rect class="button" x="420" y="185" width="330" height="40" rx="10"/>
+    <text class="small" x="535" y="210">Continuar con Gmail</text>
+    <line class="thin" x1="420" y1="250" x2="750" y2="250"/>
+    <rect class="soft" x="420" y="285" width="330" height="42" rx="8"/>
+    <rect class="soft" x="420" y="345" width="330" height="42" rx="8"/>
+    <rect class="primary" x="420" y="405" width="330" height="35" rx="10"/>
+    <text class="whiteText" x="535" y="428">Entrar</text>
+  </g>
+
+  <!-- M04 Google popup -->
+  <g transform="translate(930 620)">
+    <text class="label" x="0" y="-18">M04 - LOGIN CON GOOGLE</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="25" y="25" width="750" height="380" rx="12"/>
+    <rect class="soft" x="80" y="75" width="330" height="280" rx="8"/>
+    <text class="h2" x="105" y="120">Accede a tu cuenta</text>
+    <rect class="button" x="105" y="150" width="250" height="40" rx="9"/>
+    <rect class="soft" x="105" y="220" width="250" height="40" rx="8"/>
+    <rect class="soft" x="105" y="275" width="250" height="40" rx="8"/>
+    <rect class="primary" x="105" y="330" width="250" height="35" rx="8"/>
+
+    <rect class="frame" x="330" y="45" width="330" height="335" rx="7"/>
+    <rect class="dark" x="330" y="45" width="330" height="50" rx="7"/>
+    <text class="whiteText" x="350" y="77">Google</text>
+    <text class="h2" x="355" y="140">Selecciona una cuenta</text>
+    <text class="small" x="355" y="170">Ir a LicitIA</text>
+    <circle class="panel" cx="380" cy="220" r="20"/>
+    <text class="txt" x="415" y="215">Sebastian Cumpa</text>
+    <text class="small" x="415" y="240">usuario@gmail.com</text>
+    <line class="thin" x1="355" y1="265" x2="635" y2="265"/>
+    <text class="txt" x="355" y="305">Usar otra cuenta</text>
+  </g>
+
+  <!-- M05 Dashboard -->
+  <g transform="translate(70 1100)">
+    <text class="label" x="0" y="-18">M05 - DASHBOARD EJECUTIVO</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="20" y="20" width="120" height="390" rx="12"/>
+    <rect class="dark" x="45" y="45" width="35" height="35" rx="7"/>
+    <text class="whiteText" x="56" y="68">LI</text>
+    <rect class="button" x="35" y="100" width="85" height="28" rx="6"/>
+    <line class="thin" x1="35" y1="150" x2="110" y2="150"/>
+    <line class="thin" x1="35" y1="185" x2="110" y2="185"/>
+    <line class="thin" x1="35" y1="220" x2="110" y2="220"/>
+    <line class="thin" x1="35" y1="255" x2="110" y2="255"/>
+
+    <rect class="panel" x="160" y="20" width="620" height="105" rx="12"/>
+    <text class="label" x="185" y="52">VISTA GENERAL</text>
+    <text class="h2" x="185" y="85">Dashboard ejecutivo</text>
+    <rect class="soft" x="500" y="45" width="160" height="35" rx="18"/>
+    <rect class="primary" x="675" y="45" width="85" height="35" rx="18"/>
+    <rect class="panel" x="160" y="145" width="620" height="115" rx="12"/>
+    <text class="h2" x="185" y="190">Resumen de oportunidades y alertas</text>
+    <rect class="soft" x="610" y="170" width="135" height="65" rx="10"/>
+    <rect class="soft" x="160" y="285" width="145" height="70" rx="8"/>
+    <rect class="soft" x="320" y="285" width="145" height="70" rx="8"/>
+    <rect class="soft" x="480" y="285" width="145" height="70" rx="8"/>
+    <rect class="soft" x="640" y="285" width="140" height="70" rx="8"/>
+    <rect class="soft" x="160" y="370" width="295" height="45" rx="8"/>
+    <rect class="soft" x="485" y="370" width="295" height="45" rx="8"/>
+  </g>
+
+  <!-- M06 Oportunidades -->
+  <g transform="translate(930 1100)">
+    <text class="label" x="0" y="-18">M06 - OPORTUNIDADES</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="20" y="20" width="120" height="390" rx="12"/>
+    <rect class="button" x="35" y="120" width="85" height="28" rx="6"/>
+    <line class="thin" x1="35" y1="80" x2="110" y2="80"/>
+    <line class="thin" x1="35" y1="160" x2="110" y2="160"/>
+    <line class="thin" x1="35" y1="200" x2="110" y2="200"/>
+    <line class="thin" x1="35" y1="240" x2="110" y2="240"/>
+    <rect class="panel" x="160" y="20" width="620" height="90" rx="12"/>
+    <text class="label" x="185" y="50">MODULO PRINCIPAL</text>
+    <text class="h2" x="185" y="84">Oportunidades para filtrar y comparar</text>
+    <rect class="soft" x="500" y="45" width="150" height="32" rx="16"/>
+    <rect class="primary" x="665" y="45" width="90" height="32" rx="16"/>
+    <rect class="soft" x="160" y="130" width="190" height="55" rx="8"/>
+    <rect class="soft" x="365" y="130" width="190" height="55" rx="8"/>
+    <rect class="soft" x="570" y="130" width="210" height="55" rx="8"/>
+    <rect class="panel" x="160" y="205" width="135" height="205" rx="12"/>
+    <text class="h3" x="180" y="235">Filtros</text>
+    <rect class="soft" x="180" y="255" width="95" height="45" rx="7"/>
+    <rect class="soft" x="180" y="315" width="95" height="45" rx="7"/>
+    <rect class="soft" x="180" y="375" width="95" height="25" rx="5"/>
+    <rect class="panel" x="315" y="205" width="465" height="205" rx="12"/>
+    <text class="h3" x="335" y="235">Bandeja priorizada</text>
+    <rect class="soft" x="335" y="260" width="420" height="115" rx="8"/>
+    <text class="h3" x="360" y="292">COMPRE-2026-MDC-1</text>
+    <line class="thin" x1="360" y1="315" x2="720" y2="315"/>
+    <line class="thin" x1="360" y1="340" x2="620" y2="340"/>
+    <rect class="button" x="660" y="345" width="75" height="24" rx="12"/>
+  </g>
+
+  <!-- M07 Seguimiento -->
+  <g transform="translate(70 1580)">
+    <text class="label" x="0" y="-18">M07 - SEGUIMIENTO</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="20" y="20" width="120" height="390" rx="12"/>
+    <rect class="button" x="35" y="165" width="85" height="28" rx="6"/>
+    <line class="thin" x1="35" y1="80" x2="110" y2="80"/>
+    <line class="thin" x1="35" y1="120" x2="110" y2="120"/>
+    <line class="thin" x1="35" y1="210" x2="110" y2="210"/>
+    <line class="thin" x1="35" y1="250" x2="110" y2="250"/>
+    <rect class="panel" x="160" y="20" width="620" height="95" rx="12"/>
+    <text class="label" x="185" y="52">GESTION OPERATIVA</text>
+    <text class="h2" x="185" y="85">Seguimiento de procesos</text>
+    <rect class="button" x="560" y="45" width="85" height="32" rx="16"/>
+    <rect class="primary" x="660" y="45" width="90" height="32" rx="16"/>
+    <rect class="panel" x="160" y="135" width="620" height="70" rx="12"/>
+    <text class="h3" x="185" y="178">Filtrar oportunidades</text>
+    <rect class="button" x="620" y="155" width="80" height="30" rx="15"/>
+    <rect class="panel" x="160" y="225" width="620" height="150" rx="12"/>
+    <text class="h3" x="185" y="255">Procesos en seguimiento</text>
+    <line class="thin" x1="185" y1="285" x2="750" y2="285"/>
+    <text class="small" x="185" y="315">N</text>
+    <text class="small" x="235" y="315">Identificador</text>
+    <text class="small" x="390" y="315">Entidad</text>
+    <text class="small" x="520" y="315">Estado</text>
+    <text class="small" x="350" y="350">No hay procesos en seguimiento</text>
+    <rect class="soft" x="160" y="390" width="190" height="28" rx="6"/>
+    <rect class="soft" x="380" y="390" width="190" height="28" rx="6"/>
+    <rect class="soft" x="590" y="390" width="190" height="28" rx="6"/>
+  </g>
+
+  <!-- M08 Alertas -->
+  <g transform="translate(930 1580)">
+    <text class="label" x="0" y="-18">M08 - ALERTAS</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="20" y="20" width="120" height="390" rx="12"/>
+    <rect class="button" x="35" y="210" width="85" height="28" rx="6"/>
+    <line class="thin" x1="35" y1="80" x2="110" y2="80"/>
+    <line class="thin" x1="35" y1="120" x2="110" y2="120"/>
+    <line class="thin" x1="35" y1="165" x2="110" y2="165"/>
+    <line class="thin" x1="35" y1="255" x2="110" y2="255"/>
+    <rect class="panel" x="160" y="20" width="620" height="90" rx="12"/>
+    <text class="label" x="185" y="50">NOTIFICACIONES</text>
+    <text class="h2" x="185" y="84">Centro de reglas y correos</text>
+    <rect class="button" x="520" y="42" width="75" height="32" rx="16"/>
+    <rect class="button" x="610" y="42" width="75" height="32" rx="16"/>
+    <rect class="primary" x="700" y="42" width="60" height="32" rx="16"/>
+    <rect class="soft" x="160" y="130" width="190" height="55" rx="8"/>
+    <rect class="soft" x="365" y="130" width="190" height="55" rx="8"/>
+    <rect class="soft" x="570" y="130" width="210" height="55" rx="8"/>
+    <rect class="panel" x="160" y="215" width="390" height="185" rx="12"/>
+    <text class="h3" x="185" y="245">Configura tu regla</text>
+    <rect class="soft" x="185" y="270" width="155" height="35" rx="7"/>
+    <rect class="soft" x="360" y="270" width="155" height="35" rx="7"/>
+    <rect class="soft" x="185" y="325" width="155" height="35" rx="7"/>
+    <rect class="soft" x="360" y="325" width="155" height="35" rx="7"/>
+    <rect class="panel" x="575" y="215" width="205" height="185" rx="12"/>
+    <text class="h3" x="595" y="245">Reglas activas</text>
+    <rect class="soft" x="595" y="270" width="160" height="75" rx="8"/>
+    <line class="thin" x1="610" y1="300" x2="735" y2="300"/>
+    <rect class="button" x="610" y="320" width="50" height="22" rx="4"/>
+    <rect class="button" x="680" y="320" width="50" height="22" rx="4"/>
+  </g>
+
+  <!-- M09 Analisis Entidades -->
+  <g transform="translate(70 2060)">
+    <text class="label" x="0" y="-18">M09 - ANALISIS DE ENTIDADES</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="20" y="20" width="120" height="390" rx="12"/>
+    <rect class="button" x="35" y="255" width="85" height="28" rx="6"/>
+    <line class="thin" x1="35" y1="80" x2="110" y2="80"/>
+    <line class="thin" x1="35" y1="120" x2="110" y2="120"/>
+    <line class="thin" x1="35" y1="165" x2="110" y2="165"/>
+    <line class="thin" x1="35" y1="210" x2="110" y2="210"/>
+    <rect class="panel" x="160" y="20" width="620" height="90" rx="12"/>
+    <text class="label" x="185" y="50">ANALISIS DE ENTIDADES</text>
+    <text class="h2" x="185" y="84">Que entidades compran que productos</text>
+    <rect class="button" x="585" y="42" width="80" height="32" rx="16"/>
+    <rect class="button" x="680" y="42" width="80" height="32" rx="16"/>
+    <rect class="soft" x="160" y="135" width="145" height="70" rx="8"/>
+    <rect class="soft" x="320" y="135" width="145" height="70" rx="8"/>
+    <rect class="soft" x="480" y="135" width="145" height="70" rx="8"/>
+    <rect class="soft" x="640" y="135" width="140" height="70" rx="8"/>
+    <rect class="panel" x="160" y="230" width="295" height="150" rx="12"/>
+    <text class="h3" x="185" y="260">Entidades con mas oportunidades</text>
+    <rect class="dash" x="190" y="285" width="230" height="65"/>
+    <rect class="panel" x="485" y="230" width="295" height="150" rx="12"/>
+    <text class="h3" x="510" y="260">Oportunidades por rubro</text>
+    <circle class="thin" cx="630" cy="325" r="45"/>
+    <rect class="soft" x="160" y="395" width="620" height="25" rx="6"/>
+  </g>
+
+  <!-- M10 Configuracion -->
+  <g transform="translate(930 2060)">
+    <text class="label" x="0" y="-18">M10 - CONFIGURACION</text>
+    <rect class="frame" x="0" y="0" width="800" height="430" rx="10"/>
+    <rect class="panel" x="20" y="20" width="120" height="390" rx="12"/>
+    <rect class="button" x="35" y="300" width="85" height="28" rx="6"/>
+    <line class="thin" x1="35" y1="80" x2="110" y2="80"/>
+    <line class="thin" x1="35" y1="120" x2="110" y2="120"/>
+    <line class="thin" x1="35" y1="165" x2="110" y2="165"/>
+    <line class="thin" x1="35" y1="210" x2="110" y2="210"/>
+    <line class="thin" x1="35" y1="255" x2="110" y2="255"/>
+    <rect class="panel" x="160" y="20" width="620" height="85" rx="12"/>
+    <text class="label" x="185" y="50">CONFIGURACION</text>
+    <text class="h2" x="185" y="84">Perfil de empresa y preferencias</text>
+    <rect class="button" x="665" y="42" width="85" height="32" rx="16"/>
+    <rect class="panel" x="160" y="125" width="620" height="85" rx="12"/>
+    <text class="h3" x="185" y="155">Configura tu perfil</text>
+    <rect class="soft" x="185" y="170" width="545" height="28" rx="5"/>
+    <rect class="panel" x="160" y="230" width="620" height="180" rx="12"/>
+    <text class="h3" x="185" y="260">Palabras clave</text>
+    <rect class="soft" x="185" y="285" width="310" height="35" rx="6"/>
+    <rect class="button" x="185" y="330" width="80" height="28" rx="14"/>
+    <rect class="soft" x="520" y="285" width="210" height="70" rx="7"/>
+    <line class="thin" x1="185" y1="375" x2="730" y2="375"/>
+    <rect class="soft" x="185" y="390" width="160" height="24" rx="5"/>
+    <rect class="soft" x="365" y="390" width="160" height="24" rx="5"/>
+    <rect class="soft" x="545" y="390" width="185" height="24" rx="5"/>
+  </g>
+
+  <text class="small" x="70" y="2580">Nota: los mockups estan en blanco y negro para uso documental. Representan estructura, navegacion y componentes principales.</text>
+  <text class="small" x="70" y="2608">Elaborado para LicitIA - EMDERSOFT S.A.C.</text>
+</svg>

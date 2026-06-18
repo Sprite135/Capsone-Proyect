@@ -113,8 +113,8 @@ public class SeaceScraperService
         using var playwright = await Playwright.CreateAsync();
         var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
         {
-            Headless = false,
-            SlowMo = 100
+            Headless = true,
+            SlowMo = 0
         });
 
         try
@@ -406,8 +406,8 @@ public class SeaceScraperService
             // Usar Chromium (headless=true para más velocidad)
             var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
             {
-                Headless = false,
-                SlowMo = 100 // Hacer más lento para que sea visible
+                Headless = true,
+                SlowMo = 0
             });
 
             var context = await browser.NewContextAsync();

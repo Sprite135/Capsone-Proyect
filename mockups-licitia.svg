@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071426"/>
+      <stop offset="100%" stop-color="#0d1d33"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2f6df6"/>
+      <stop offset="100%" stop-color="#6f48ff"/>
+    </linearGradient>
+    <style>
+      .bg{fill:url(#bg)}
+      .panel{fill:#101d31;stroke:#2b3d57;stroke-width:2}
+      .panel2{fill:#15243a;stroke:#344963;stroke-width:1.5}
+      .muted{fill:#91a4bf;font-family:Inter,Arial,sans-serif;font-size:22px}
+      .tiny{fill:#91a4bf;font-family:Inter,Arial,sans-serif;font-size:16px}
+      .title{fill:#e8f1ff;font-family:Inter,Arial,sans-serif;font-size:44px;font-weight:800}
+      .screen-title{fill:#e8f1ff;font-family:Inter,Arial,sans-serif;font-size:24px;font-weight:800}
+      .label{fill:#9ec1ff;font-family:Inter,Arial,sans-serif;font-size:16px;font-weight:700;letter-spacing:3px}
+      .text{fill:#dce8f8;font-family:Inter,Arial,sans-serif;font-size:18px}
+      .small{fill:#dce8f8;font-family:Inter,Arial,sans-serif;font-size:15px}
+      .accent{fill:url(#blue)}
+      .line{stroke:#36506f;stroke-width:2}
+      .chip{fill:#203652;stroke:#426086;stroke-width:1}
+      .ok{fill:#27d6c2}
+      .warn{fill:#ffbd2e}
+      .danger{fill:#ff7a59}
+      .paper{fill:#f4f7fb}
+      .paperline{stroke:#c8d2df;stroke-width:2}
+    </style>
+  </defs>
+  <rect class="bg" width="1800" height="1200"/>
+  <text x="70" y="70" class="title">Mockups de interfaces - LicitIA</text>
+  <text x="70" y="105" class="muted">Prototipos visuales de las pantallas principales del sistema</text>
+
+  <!-- Screen helper dimensions: x,y,w,h = 70/630/1190, 145/520/895, 500/300 -->
+
+  <!-- Login -->
+  <rect x="70" y="145" width="520" height="300" rx="20" class="panel"/>
+  <text x="100" y="185" class="label">M01</text>
+  <text x="100" y="220" class="screen-title">Inicio de sesion</text>
+  <circle cx="130" cy="265" r="28" class="accent"/>
+  <text x="118" y="273" class="small" font-weight="800">LI</text>
+  <text x="175" y="258" class="text" font-weight="800">LicitIA</text>
+  <text x="175" y="282" class="tiny">Acceso seguro al sistema</text>
+  <rect x="100" y="315" width="430" height="38" rx="10" class="panel2"/>
+  <text x="120" y="340" class="tiny">Correo electronico</text>
+  <rect x="100" y="365" width="430" height="38" rx="10" class="panel2"/>
+  <text x="120" y="390" class="tiny">Contrasena</text>
+  <rect x="100" y="415" width="200" height="46" rx="22" class="accent"/>
+  <text x="142" y="444" class="small" font-weight="800">Iniciar sesion</text>
+  <rect x="315" y="415" width="215" height="46" rx="22" class="chip"/>
+  <text x="343" y="444" class="small" font-weight="800">Continuar con Google</text>
+
+  <!-- Dashboard -->
+  <rect x="640" y="145" width="520" height="300" rx="20" class="panel"/>
+  <text x="670" y="185" class="label">M02</text>
+  <text x="670" y="220" class="screen-title">Dashboard BI</text>
+  <rect x="670" y="245" width="140" height="70" rx="12" class="panel2"/>
+  <text x="690" y="272" class="tiny">Oportunidades</text>
+  <text x="690" y="302" class="screen-title">128</text>
+  <rect x="830" y="245" width="140" height="70" rx="12" class="panel2"/>
+  <text x="850" y="272" class="tiny">Afinidad prom.</text>
+  <text x="850" y="302" class="screen-title">76%</text>
+  <rect x="990" y="245" width="140" height="70" rx="12" class="panel2"/>
+  <text x="1010" y="272" class="tiny">Monto total</text>
+  <text x="1010" y="302" class="screen-title">S/ 4.2M</text>
+  <rect x="670" y="345" width="210" height="70" rx="12" class="panel2"/>
+  <rect x="695" y="385" width="22" height="18" class="accent"/>
+  <rect x="725" y="365" width="22" height="38" class="accent"/>
+  <rect x="755" y="375" width="22" height="28" class="accent"/>
+  <rect x="785" y="355" width="22" height="48" class="accent"/>
+  <text x="825" y="385" class="tiny">Por categoria</text>
+  <rect x="910" y="345" width="220" height="70" rx="12" class="panel2"/>
+  <polyline points="935,395 975,375 1015,385 1055,355 1100,365" fill="none" stroke="#27d6c2" stroke-width="4"/>
+  <text x="935" y="333" class="tiny">Tendencias mensuales</text>
+
+  <!-- Opportunities -->
+  <rect x="1210" y="145" width="520" height="300" rx="20" class="panel"/>
+  <text x="1240" y="185" class="label">M03</text>
+  <text x="1240" y="220" class="screen-title">Bandeja de oportunidades</text>
+  <rect x="1240" y="250" width="140" height="165" rx="14" class="panel2"/>
+  <text x="1260" y="280" class="small" font-weight="800">Filtros</text>
+  <rect x="1260" y="300" width="90" height="24" rx="12" class="chip"/>
+  <rect x="1260" y="335" width="70" height="24" rx="12" class="chip"/>
+  <rect x="1260" y="370" width="95" height="24" rx="12" class="chip"/>
+  <rect x="1410" y="250" width="280" height="68" rx="14" class="panel2"/>
+  <circle cx="1442" cy="284" r="17" class="warn"/>
+  <text x="1435" y="291" class="small" font-weight="800">1</text>
+  <text x="1470" y="278" class="small" font-weight="800">LP-ABR-2026</text>
+  <text x="1470" y="303" class="tiny">Videovigilancia - afinidad 95%</text>
+  <rect x="1630" y="270" width="45" height="28" rx="14" class="ok"/>
+  <text x="1640" y="290" class="small" font-weight="800">95%</text>
+  <rect x="1410" y="335" width="280" height="68" rx="14" class="panel2"/>
+  <text x="1430" y="363" class="small" font-weight="800">COMPRE-2026</text>
+  <text x="1430" y="388" class="tiny">Mantenimiento preventivo</text>
+  <rect x="1630" y="355" width="45" height="28" rx="14" class="danger"/>
+  <text x="1640" y="375" class="small" font-weight="800">64%</text>
+
+  <!-- Config -->
+  <rect x="70" y="500" width="520" height="300" rx="20" class="panel"/>
+  <text x="100" y="540" class="label">M04</text>
+  <text x="100" y="575" class="screen-title">Configuracion</text>
+  <rect x="100" y="610" width="430" height="45" rx="10" class="panel2"/>
+  <text x="120" y="638" class="tiny">Empresa: EMDERSOFT S.A.C.</text>
+  <text x="100" y="690" class="small" font-weight="800">Keywords preferidas</text>
+  <rect x="100" y="710" width="130" height="34" rx="17" class="chip"/>
+  <text x="120" y="733" class="tiny">videovigilancia</text>
+  <rect x="245" y="710" width="105" height="34" rx="17" class="chip"/>
+  <text x="265" y="733" class="tiny">software</text>
+  <text x="100" y="770" class="small" font-weight="800">Filtros SEACE</text>
+  <rect x="225" y="750" width="305" height="34" rx="10" class="panel2"/>
+  <text x="245" y="773" class="tiny">Ano 2026 | Bien | Lima</text>
+
+  <!-- Detail -->
+  <rect x="640" y="500" width="520" height="300" rx="20" class="panel"/>
+  <text x="670" y="540" class="label">M05</text>
+  <text x="670" y="575" class="screen-title">Detalle de licitacion</text>
+  <rect x="670" y="605" width="460" height="36" rx="18" class="chip"/>
+  <text x="690" y="629" class="tiny">Resumen  |  Ficha SEACE  |  Cronograma  |  Documentos  |  IA</text>
+  <rect x="670" y="665" width="210" height="95" rx="12" class="panel2"/>
+  <text x="690" y="695" class="small" font-weight="800">Ficha oficial</text>
+  <text x="690" y="723" class="tiny">Entidad, objeto, monto</text>
+  <text x="690" y="748" class="tiny">descripcion y normativa</text>
+  <rect x="910" y="665" width="220" height="95" rx="12" class="panel2"/>
+  <text x="930" y="695" class="small" font-weight="800">Cronograma</text>
+  <line x1="930" y1="715" x2="1110" y2="715" class="line"/>
+  <line x1="930" y1="740" x2="1110" y2="740" class="line"/>
+
+  <!-- Document viewer -->
+  <rect x="1210" y="500" width="520" height="300" rx="20" class="panel"/>
+  <text x="1240" y="540" class="label">M06</text>
+  <text x="1240" y="575" class="screen-title">Visor documental + Gemini</text>
+  <rect x="1240" y="605" width="250" height="160" rx="10" fill="#222"/>
+  <rect x="1290" y="625" width="150" height="120" class="paper"/>
+  <line x1="1310" y1="655" x2="1420" y2="655" class="paperline"/>
+  <line x1="1310" y1="680" x2="1420" y2="680" class="paperline"/>
+  <line x1="1310" y1="705" x2="1400" y2="705" class="paperline"/>
+  <rect x="1510" y="605" width="190" height="160" rx="14" class="panel2"/>
+  <text x="1530" y="635" class="small" font-weight="800">Gemini</text>
+  <rect x="1530" y="655" width="145" height="36" rx="12" class="chip"/>
+  <text x="1544" y="678" class="tiny">Requisitos?</text>
+  <rect x="1530" y="705" width="145" height="36" rx="12" class="accent"/>
+  <text x="1544" y="728" class="small" font-weight="800">Enviar</text>
+
+  <!-- Footer note -->
+  <rect x="70" y="855" width="1660" height="230" rx="22" class="panel"/>
+  <text x="105" y="900" class="screen-title">Resumen de mockups incluidos</text>
+  <text x="105" y="940" class="text">M01 Inicio de sesion y autenticacion Google</text>
+  <text x="105" y="975" class="text">M02 Dashboard BI con indicadores, graficos por categoria, entidad y tendencias</text>
+  <text x="105" y="1010" class="text">M03 Bandeja de oportunidades con filtros, afinidad y acceso al detalle</text>
+  <text x="900" y="940" class="text">M04 Configuracion de perfil, keywords y filtros SEACE</text>
+  <text x="900" y="975" class="text">M05 Detalle de licitacion con ficha, cronograma, documentos e IA</text>
+  <text x="900" y="1010" class="text">M06 Visor PDF integrado con asistente documental Gemini</text>
+</svg>

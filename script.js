@@ -1607,9 +1607,20 @@ function renderOpportunities() {
 
   if (filtered.length === 0) {
     opportunitiesContainer.innerHTML = `
-      <div class="result-empty">
-        No hay oportunidades que coincidan con los filtros actuales.
+      <div class="result-empty empty-opportunities">
+        <div class="empty-opportunities-icon" aria-hidden="true">0</div>
+        <div class="empty-opportunities-copy">
+          <h4>No encontramos oportunidades con estos filtros</h4>
+          <p>Prueba limpiar la busqueda, ajustar el rubro o revisar el rango de monto para volver a ver resultados.</p>
+        </div>
+        <button class="secondary-button empty-opportunities-action" type="button" id="clearOpportunityFilters">
+          Limpiar filtros
+        </button>
       </div>`;
+    const clearFiltersButton = document.getElementById("clearOpportunityFilters");
+    if (clearFiltersButton) {
+      clearFiltersButton.addEventListener("click", resetOpportunityFilters);
+    }
     return;
   }
 
@@ -1617,6 +1628,31 @@ function renderOpportunities() {
 
   // Add pagination controls
   renderPaginationControls(totalPages);
+}
+
+function resetOpportunityFilters() {
+  if (opportunitySearch) {
+    opportunitySearch.value = "";
+  }
+
+  document.querySelectorAll('.chip[data-filter-group]').forEach((chip) => {
+    const group = chip.dataset.filterGroup;
+    const value = chip.dataset.filterValue;
+    const shouldActivate =
+      (group === "favorite" && value === "all") ||
+      (group !== "favorite" && value === "Todos");
+    chip.classList.toggle("active", shouldActivate);
+  });
+
+  const minAmountInput = document.getElementById("minAmount");
+  const maxAmountInput = document.getElementById("maxAmount");
+  if (minAmountInput) minAmountInput.value = "";
+  if (maxAmountInput) maxAmountInput.value = "";
+
+  currentPage = 1;
+  lastFilteredCount = -1;
+  renderOpportunities();
+  setMessage("Filtros de oportunidades limpiados.");
 }
 
 function buildOpportunitySearchText(item) {

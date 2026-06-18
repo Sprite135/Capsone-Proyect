@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <style>.bg{fill:#fff}.box{fill:#fff;stroke:#111;stroke-width:2}.soft{fill:#f4f4f4;stroke:#111;stroke-width:1.5}.dark{fill:#111}.thin{stroke:#555;stroke-width:1.2}.t{font-family:Arial,sans-serif;fill:#111}.h1{font:bold 38px Arial}.h2{font:bold 26px Arial}.s{font:16px Arial}.xs{font:13px Arial}.w{font:bold 15px Arial;fill:#fff}</style>
+  <rect class="bg" width="1200" height="760"/><text class="h2 t" x="40" y="45">M04 - Ventana de autenticacion Google</text>
+  <rect class="box" x="230" y="80" width="740" height="610" rx="16"/>
+  <rect class="soft" x="255" y="110" width="690" height="550" rx="14"/>
+  <text class="h1 t" x="290" y="185">Login LicitIA</text>
+  <rect class="box" x="290" y="230" width="250" height="45" rx="10"/><rect class="box" x="290" y="315" width="250" height="45" rx="10"/><rect class="box" x="290" y="385" width="250" height="45" rx="10"/>
+  <rect class="dark" x="290" y="455" width="250" height="45" rx="10"/>
+  <rect class="box" x="500" y="125" width="360" height="470" rx="8"/>
+  <rect class="dark" x="500" y="125" width="360" height="60" rx="8"/><text class="w" x="530" y="162">Google Chrome</text>
+  <text class="h2 t" x="535" y="240">Selecciona una cuenta</text><text class="s t" x="535" y="275">Ir a LicitIA</text>
+  <circle class="soft" cx="570" cy="335" r="24"/><text class="h2 t" x="610" y="330">Sebastian Cumpa</text><text class="s t" x="610" y="355">usuario@gmail.com</text>
+  <line class="thin" x1="535" y1="395" x2="825" y2="395"/>
+  <circle class="soft" cx="570" cy="445" r="20"/><text class="h2 t" x="610" y="453">Usar otra cuenta</text>
+  <text class="xs t" x="535" y="555">Ayuda</text><text class="xs t" x="640" y="555">Privacidad</text><text class="xs t" x="760" y="555">Terminos</text>
+</svg>

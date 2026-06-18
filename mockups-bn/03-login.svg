@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <style>.bg{fill:#fff}.box{fill:#fff;stroke:#111;stroke-width:2}.soft{fill:#f4f4f4;stroke:#111;stroke-width:1.5}.dark{fill:#111}.thin{stroke:#555;stroke-width:1.2}.t{font-family:Arial,sans-serif;fill:#111}.h1{font:bold 42px Arial}.h2{font:bold 26px Arial}.s{font:16px Arial}.xs{font:13px Arial}.w{font:bold 15px Arial;fill:#fff}</style>
+  <rect class="bg" width="1200" height="760"/><text class="h2 t" x="40" y="45">M03 - Inicio de sesion</text>
+  <rect class="box" x="230" y="80" width="740" height="610" rx="16"/>
+  <rect class="soft" x="250" y="105" width="330" height="560" rx="14"/>
+  <text class="xs t" x="280" y="145">ACCESO SEGURO</text>
+  <text class="h1 t" x="280" y="200">Vuelve al centro</text><text class="h1 t" x="280" y="250">de decisiones de</text><text class="h1 t" x="280" y="300">licitaciones</text>
+  <rect class="box" x="280" y="355" width="85" height="65" rx="10"/><rect class="box" x="380" y="355" width="85" height="65" rx="10"/><rect class="box" x="480" y="355" width="75" height="65" rx="10"/>
+  <rect class="box" x="280" y="455" width="275" height="70" rx="10"/><rect class="box" x="280" y="550" width="275" height="70" rx="10"/>
+  <rect class="soft" x="625" y="120" width="110" height="40" rx="13"/><text class="s t" x="645" y="146">Inicio</text>
+  <rect class="soft" x="820" y="120" width="100" height="40" rx="13"/><text class="s t" x="835" y="146">Registro</text>
+  <text class="xs t" x="625" y="220">LOGIN</text><text class="h1 t" x="625" y="270">Accede a tu cuenta</text>
+  <rect class="soft" x="625" y="305" width="295" height="45" rx="10"/><text class="s t" x="705" y="333">Continuar con Gmail</text>
+  <line class="thin" x1="625" y1="385" x2="920" y2="385"/>
+  <rect class="soft" x="625" y="425" width="295" height="48" rx="9"/><rect class="soft" x="625" y="500" width="295" height="48" rx="9"/>
+  <rect class="box" x="625" y="570" width="15" height="15"/><text class="s t" x="655" y="585">Recordarme</text>
+  <rect class="dark" x="625" y="620" width="295" height="45" rx="10"/><text class="w" x="725" y="648">Entrar</text>
+</svg>

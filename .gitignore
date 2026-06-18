@@ -94,3 +94,19 @@ appsettings.json
 appsettings.Development.json
 appsettings.Production.json
 NuGet.Config
+
+# Local/generated workspace artifacts
+.run/
+.codex_spreadsheet/
+docx_work/
+
+# Intermediate academic document generators
+outputs/instrumentos_recoleccion/*.py
+outputs/instrumentos_recoleccion/*_llenado.xlsx
+outputs/instrumentos_recoleccion/*_llenado_corregido.xlsx
+outputs/instrumentos_recoleccion/*_completa.docx
+outputs/instrumentos_recoleccion/*_completa.xlsx
+outputs/instrumentos_recoleccion/Ficha_validacion_juicio_expertos_LicitIA.docx
+outputs/instrumentos_recoleccion/Ficha_validacion_usuario_experto_EMDERSOFT.docx
+outputs/instrumentos_recoleccion/Informe_validez_contenido_LicitIA.docx
+outputs/instrumentos_recoleccion/Matriz_validacion_juicio_expertos_LicitIA.xlsx

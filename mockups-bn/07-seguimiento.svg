@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <style>.bg{fill:#fff}.box{fill:#fff;stroke:#111;stroke-width:2}.soft{fill:#f4f4f4;stroke:#111;stroke-width:1.5}.dark{fill:#111}.thin{stroke:#555;stroke-width:1.2}.t{font-family:Arial,sans-serif;fill:#111}.h1{font:bold 38px Arial}.h2{font:bold 24px Arial}.h3{font:bold 20px Arial}.s{font:16px Arial}.xs{font:13px Arial}.w{font:bold 15px Arial;fill:#fff}</style>
+  <rect class="bg" width="1200" height="760"/><text class="h2 t" x="40" y="45">M07 - Seguimiento</text>
+  <rect class="box" x="45" y="80" width="1110" height="625" rx="14"/>
+  <rect class="soft" x="70" y="105" width="180" height="575" rx="14"/><rect class="box" x="95" y="285" width="130" height="35" rx="7"/>
+  <line class="thin" x1="95" y1="170" x2="210" y2="170"/><line class="thin" x1="95" y1="225" x2="210" y2="225"/><line class="thin" x1="95" y1="345" x2="210" y2="345"/><line class="thin" x1="95" y1="395" x2="210" y2="395"/>
+  <rect class="soft" x="280" y="105" width="845" height="115" rx="14"/><text class="xs t" x="310" y="140">GESTION OPERATIVA</text><text class="h1 t" x="310" y="185">Seguimiento de procesos y responsables</text><rect class="box" x="830" y="140" width="120" height="38" rx="19"/><rect class="dark" x="970" y="140" width="120" height="38" rx="19"/>
+  <rect class="soft" x="280" y="250" width="845" height="95" rx="14"/><text class="h3 t" x="310" y="305">Filtrar oportunidades</text><rect class="dark" x="930" y="280" width="110" height="38" rx="19"/>
+  <rect class="soft" x="280" y="375" width="845" height="210" rx="14"/><text class="h3 t" x="310" y="415">Procesos en seguimiento</text><line class="thin" x1="310" y1="455" x2="1085" y2="455"/>
+  <text class="s t" x="315" y="490">N</text><text class="s t" x="380" y="490">Identificador</text><text class="s t" x="560" y="490">Entidad</text><text class="s t" x="740" y="490">Presentacion</text><text class="s t" x="940" y="490">Estado</text>
+  <text class="s t" x="565" y="535">No hay procesos en seguimiento</text><line class="thin" x1="310" y1="555" x2="1085" y2="555"/>
+  <rect class="soft" x="280" y="620" width="250" height="60" rx="10"/><rect class="soft" x="595" y="620" width="250" height="60" rx="10"/><rect class="soft" x="875" y="620" width="250" height="60" rx="10"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <style>.bg{fill:#fff}.box{fill:#fff;stroke:#111;stroke-width:2}.soft{fill:#f4f4f4;stroke:#111;stroke-width:1.5}.dark{fill:#111}.thin{stroke:#555;stroke-width:1.2}.t{font-family:Arial,sans-serif;fill:#111}.h1{font:bold 38px Arial}.h2{font:bold 24px Arial}.h3{font:bold 20px Arial}.s{font:16px Arial}.xs{font:13px Arial}.w{font:bold 15px Arial;fill:#fff}</style>
+  <rect class="bg" width="1200" height="760"/><text class="h2 t" x="40" y="45">M06 - Oportunidades</text>
+  <rect class="box" x="45" y="80" width="1110" height="625" rx="14"/>
+  <rect class="soft" x="70" y="105" width="180" height="575" rx="14"/><rect class="box" x="95" y="230" width="130" height="35" rx="7"/>
+  <line class="thin" x1="95" y1="170" x2="210" y2="170"/><line class="thin" x1="95" y1="285" x2="210" y2="285"/><line class="thin" x1="95" y1="340" x2="210" y2="340"/><line class="thin" x1="95" y1="395" x2="210" y2="395"/>
+  <rect class="soft" x="280" y="105" width="845" height="115" rx="14"/><text class="xs t" x="310" y="140">MODULO PRINCIPAL</text><text class="h1 t" x="310" y="185">Oportunidades para filtrar y comparar</text>
+  <rect class="box" x="700" y="135" width="210" height="38" rx="19"/><rect class="dark" x="930" y="135" width="150" height="38" rx="19"/>
+  <rect class="soft" x="280" y="245" width="255" height="70" rx="10"/><rect class="soft" x="555" y="245" width="255" height="70" rx="10"/><rect class="soft" x="830" y="245" width="295" height="70" rx="10"/>
+  <rect class="soft" x="280" y="345" width="210" height="320" rx="14"/><text class="h3 t" x="310" y="385">Busqueda inteligente</text><rect class="box" x="310" y="425" width="150" height="65" rx="8"/><rect class="box" x="310" y="515" width="150" height="65" rx="8"/><rect class="box" x="310" y="605" width="150" height="40" rx="8"/>
+  <rect class="soft" x="515" y="345" width="610" height="320" rx="14"/><text class="h3 t" x="545" y="385">Bandeja priorizada</text>
+  <rect class="box" x="545" y="420" width="545" height="140" rx="10"/><text class="h3 t" x="575" y="455">COMPRE-COMPRE-2026</text><line class="thin" x1="575" y1="485" x2="1050" y2="485"/><line class="thin" x1="575" y1="520" x2="930" y2="520"/><rect class="box" x="950" y="525" width="100" height="28" rx="14"/>
+  <rect class="box" x="545" y="580" width="545" height="65" rx="10"/>
+</svg>
